@@ -1,10 +1,15 @@
 $(document).ready(() => {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+    const previousTheme = localStorage.getItem("theme");
+    if (previousTheme) {
+        loadTheme(previousTheme)
+    }
 });
 
 $("#searchForm").submit(function(e) {
-    e.preventDefault();
+    e.preventDefault(); 
 
     const url = $(this).find("input[type=search]").val();
 
@@ -13,20 +18,21 @@ $("#searchForm").submit(function(e) {
         return;
     }
 
-    $.ajax({
-        type: "POST",
-        url: "/",
-        contentType: "application/json",
-        data: JSON.stringify({
-            url: url
-        }),
-        error: (e) => {
-            alert(JSON.stringify(e));
-        },
-        success: (data) => {
-            // alert(JSON.stringify(data));
-        }
-    });
+    alert("searching");
+
+    var eventSource = new EventSource("/stream-screenshots?url=" + encodeURIComponent(url));
+    eventSource.onmessage = function(event) {
+        const screenshotPath = event.data;
+        $("#outputRow").append(`
+            <div class="col-md-3 mb-4">
+                <img src="${screenshotPath}"  class="w-100"/>
+            </div>
+        `);
+    }
+    eventSource.onerror = function() {
+        console.error("An error occured while trying to connect [eventsource]");
+        eventSource.close();
+    }
 });
 
 function validUrl(url) {
@@ -35,14 +41,19 @@ function validUrl(url) {
 }
 
 $("#themeBtn").on("click", function() {
-    const icon = $(this).find("i.bi");
-
     const currentTheme = $(document.body).attr("data-bs-theme");
     const oppositeTheme = currentTheme == "dark" ? "light" : "dark";
 
-    $(document.body).attr("data-bs-theme", oppositeTheme);
+    loadTheme(oppositeTheme);
+});
 
-    if (oppositeTheme == "light") {
+function loadTheme(theme) {
+    localStorage.setItem("theme", theme);
+
+    const icon = $("#themeBtn").find("i.bi");
+    $(document.body).attr("data-bs-theme", theme);
+
+    if (theme == "light") {
         icon.removeClass("bi-sun").addClass("bi-moon-stars");
         $("#brand img").attr("src", lightIconPath);
     }
@@ -50,7 +61,7 @@ $("#themeBtn").on("click", function() {
         icon.removeClass("bi-moon-stars").addClass("bi-sun");
         $("#brand img").attr("src", darkIconPath);
     }
-});
+}
 
 $("#addResolution").on("click", (e) => {
     e.preventDefault();
@@ -82,17 +93,6 @@ function addResolution() {
             <button class="btn border-0 shadow-0" type="button" onclick="$(this).parent().remove()">
                 <i class="bi bi-x"></i>
             </button>
-        </div>
-    `);
-}
-
-var eventSource = new EventSource("/");
-eventSource.onmessage = function(event) {
-    alert("test");
-    const screenshotPath = event.data;
-    $("#outputRow").append(`
-        <div class="col-md-3">
-            <img src="${screenshotPath}" />
         </div>
     `);
 }

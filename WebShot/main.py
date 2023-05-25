@@ -2,12 +2,12 @@
 
 from flask import Flask
 
-from config import Config
+from config import FlaskConfig
 from views import index_blueprint
 
 app = Flask(__name__, template_folder="templates/", static_folder='static/')
-app.config.from_object(Config)
+app.config.from_object(FlaskConfig)
 app.register_blueprint(index_blueprint)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(threaded=True)

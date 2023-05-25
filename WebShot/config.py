@@ -1,6 +1,7 @@
 """Configurations for the application."""
 
 
-class Config:
+class FlaskConfig:
     DEBUG = True
     SECRET_KEY = "testing-secret-key"
+    UPLOAD_FOLDER = "output/"
