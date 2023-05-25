@@ -25,7 +25,9 @@ $("#searchForm").submit(function(e) {
         const screenshotPath = event.data;
         $("#outputRow").append(`
             <div class="col-md-3 mb-4">
-                <img src="${screenshotPath}"  class="w-100"/>
+                <a type="button" href="${screenshotPath}" target="_blank">
+                    <img src="${screenshotPath}" class="w-100 rounded shadow"/>
+                </a>
             </div>
         `);
     }
