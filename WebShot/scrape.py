@@ -1,13 +1,14 @@
 """Scraping processes for the application."""
 
 from pathlib import Path
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, ParseResult
 from typing import Generator
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import WebDriverException
+
 
 class Scraper:
     """
@@ -41,7 +42,9 @@ class Scraper:
         options.add_argument("--window-size=1920,1080")
         self.driver = webdriver.Chrome(driver_path, options=options)
 
+        self.initial_url: ParseResult = None
         self.visited_urls = set()
+        self.url_queue = []
 
     def stream_screenshots_generator(self, url: str) -> Generator[str, None, None]:
         """
@@ -58,68 +61,79 @@ class Scraper:
             A generator of relative screenshot filepaths from the given url.
         """
 
+        self.initial_url = urlparse(url)
+        self.url_queue.append(url)
+
         # A clean slate is required to avoid conflicts with previous streams
         self.visited_urls.clear()
 
         def generate():
-            screenshots = self.capture_recursive(url)
+            screenshots = self.process_url_queue()
 
             for screenshot in screenshots:
                 yield f"data: {screenshot}\n\n"
 
         return generate()
 
-    def capture_recursive(self, url: str) -> str | Generator[str, None, None]:
+    def process_url_queue(self):
         """
         Recursively captures all screenshots from the given url and it's child pages.
-
-        Parameters
-        ----------
-        url : str
-            The initial URL to visit, all scraping will start from this URL.
-
-        Returns
-        -------
-        screenshots: list of str
-            A list of relative screenshot filepaths from the given url.
 
         Yields
         ------
         screenshot_path : str
-            A relative screenshot filepath from the given url.
-        Iterator[str]
-            A generator of relative screenshot filepaths from the given url.
-
-        Raises
-        ------
-        WebDriverException
-            An error occurred while capturing the screenshots.
+            A relative path of the most recently taken screenshot.
         """
 
         screenshots = []
 
-        if url in self.visited_urls:
-            return screenshots
+        while self.url_queue:
+            url = self.url_queue.pop(0)
 
-        self.visited_urls.add(url)
-        domain = urlparse(url).netloc
+            if url in self.visited_urls:
+                continue
 
-        try:
-            screenshot_path = self.capture(url)
+            # load the current page
+            self.driver.get(url)
+
+            # check we are still on the same domain and not in a visited domain
+            if urlparse(self.driver.current_url).netloc != self.initial_url.netloc or self.driver.current_url in self.visited_urls:
+                continue
+
+            self.visited_urls.add(url)
+
+            # capture screenshot of the current page
+            screenshot_path = self.capture()
             if screenshot_path is not None:
                 screenshots.append(screenshot_path)
                 yield screenshot_path
 
-            hrefs = [anchor_tag.get_attribute("href") for anchor_tag in self.get_anchor_tags(url)]
-            for href in hrefs:
-                if not (href and urlparse(href).netloc == domain):
-                    continue
+            self.scrape_urls_to_queue(url)
 
-                absolute_url = self.construct_absolute_url(url, href.removesuffix("#").removesuffix("/"))
-                yield from self.capture_recursive(absolute_url)
+    def scrape_urls_to_queue(self, url: str) -> None:
+        """
+        Scrapes for URLs on the current page and appends them to `self.url_queue`.
 
-        except WebDriverException as error:
-            print(f"error capturing screenshots: {error}")
+        Parameters
+        ----------
+        url : str
+            The URL of the webpage to scrape.
+        """
+
+        def is_initial_domain(url: str) -> bool:
+            return urlparse(url).netloc == self.initial_url.netloc
+
+        def clean_url(url: str) -> str:
+            return url.removesuffix("#").removesuffix("/")
+
+        hrefs = [anchor_tag.get_attribute("href") for anchor_tag in self.get_anchor_tags()]
+        for href in hrefs:
+            if not href:
+                continue
+
+            absolute_url = self.construct_absolute_url(url, clean_url(href))
+            if is_initial_domain(href) and absolute_url not in self.visited_urls:
+                self.url_queue.append(absolute_url)
 
     def create_screenshot_folder(self, relative_path: Path, safe_characters: tuple[str]) -> Path:
         """
@@ -148,14 +162,9 @@ class Scraper:
 
         return screenshot_folder
 
-    def capture(self, url: str) -> str:
+    def capture(self) -> str:
         """
         Captures a screenshot and saves it to disk.
-
-        Parameters
-        ----------
-        url : str
-            The URL of the webpage to capture a screenshot of.
 
         Returns
         -------
@@ -164,13 +173,11 @@ class Scraper:
         """
 
         try:
-            self.driver.get(url)
-
             # The output path contains all output files
             output_path = Path(Path.cwd() / "output/")
             output_path.mkdir(exist_ok=True)
 
-            safe_characters = " ._/-".split("")
+            safe_characters = [*" ._/-"]
             screenshot_folder = self.create_screenshot_folder(output_path, safe_characters)
             filename = screenshot_folder / "1920x1080.png"
 
@@ -182,7 +189,7 @@ class Scraper:
         except WebDriverException as error:
             print(f"Error capturing screenshots: {error}")
 
-    def get_anchor_tags(self, url: str) -> list:
+    def get_anchor_tags(self) -> list:
         """
         Returns a list of `WebElements` representing all anchor tags found on the current web page.
 
@@ -197,7 +204,6 @@ class Scraper:
             A list of `WebElements` representing anchor tags.
         """
 
-        self.driver.get(url)
         anchor_tags = self.driver.find_elements(By.TAG_NAME, "a")
         return anchor_tags
 
