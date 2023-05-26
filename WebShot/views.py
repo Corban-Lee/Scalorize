@@ -5,7 +5,6 @@ from urllib.parse import unquote
 from flask import Blueprint, render_template, request, Response, send_file, make_response
 from scrape import Scraper
 
-scraper = Scraper()
 index_blueprint = Blueprint("index", __name__)
 
 @index_blueprint.route("/")
@@ -16,7 +15,7 @@ def index():
 def stream_screenshots():
     url = request.args.get("url")
     print("streaming from url: " + url)
-    response = make_response(Response(scraper.stream_screenshots_generator(url), mimetype="text/event-stream"))
+    response = make_response(Response(Scraper().stream_screenshots_generator(url), mimetype="text/event-stream"))
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'

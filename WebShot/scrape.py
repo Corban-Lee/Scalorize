@@ -35,13 +35,13 @@ class Scraper:
         Creates and returns an absolute URL from the given base and relative URLs.
     """
 
-    def __init__(self):
+    def __init__(self, resolutions: tuple[str] = ("1920x1080", "1080x1080")):
         driver_path = "drivers/chrome-win32.exe"
         options = Options()
         options.add_argument("--headless")
-        options.add_argument("--window-size=1920,1080")
         self.driver = webdriver.Chrome(driver_path, options=options)
 
+        self.resolutions = resolutions
         self.initial_url: ParseResult = None
         self.visited_urls = set()
         self.url_queue = []
@@ -68,10 +68,11 @@ class Scraper:
         self.visited_urls.clear()
 
         def generate():
-            screenshots = self.process_url_queue()
+            screenshots_group = self.process_url_queue()
 
-            for screenshot in screenshots:
-                yield f"data: {screenshot}\n\n"
+            for group in screenshots_group:
+                for screenshot in group:
+                    yield f"data: {str(screenshot)}\n\n"
 
         return generate()
 
@@ -81,7 +82,7 @@ class Scraper:
 
         Yields
         ------
-        screenshot_path : str
+        screenshot_paths : list of Path objects
             A relative path of the most recently taken screenshot.
         """
 
@@ -103,10 +104,9 @@ class Scraper:
             self.visited_urls.add(url)
 
             # capture screenshot of the current page
-            screenshot_path = self.capture()
-            if screenshot_path is not None:
-                screenshots.append(screenshot_path)
-                yield screenshot_path
+            screenshot_paths = self.capture()
+            screenshots.extend(screenshot_paths)
+            yield screenshot_paths
 
             self.scrape_urls_to_queue(url)
 
@@ -179,12 +179,18 @@ class Scraper:
 
             safe_characters = [*" ._/-"]
             screenshot_folder = self.create_screenshot_folder(output_path, safe_characters)
-            filename = screenshot_folder / "1920x1080.png"
 
-            self.driver.save_screenshot(filename)
+            relative_paths = []
+            for resolution in self.resolutions:
+                width, height = resolution.split("x")
+                filename = screenshot_folder / f"{resolution}.png"
 
-            # prefer relative path over absolute path
-            return str(filename).replace(str(output_path), "output/")
+                self.driver.set_window_size(int(width), int(height))
+                self.driver.save_screenshot(filename)
+
+                relative_paths.append("output/" / Path(filename).relative_to(output_path))
+
+            return relative_paths
 
         except WebDriverException as error:
             print(f"Error capturing screenshots: {error}")
