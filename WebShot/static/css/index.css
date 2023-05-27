@@ -1,0 +1,28 @@
+
+.btn-body-tertiary  {
+    background-color: rgba(var(--bs-tertiary-bg-rgb),var(--bs-bg-opacity));
+    border-color: #f8f9fa;
+    border: none;
+
+}
+
+.btn-body-tertiary:hover {
+    background-color: rgba(var(--bs-tertiary-bg-rgb), 60%);
+}
+
+.toggle-folder {
+    white-space: nowrap;
+}
+
+#filesystem ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+#filesystem ul>li {
+    margin-top: 0.2rem;
+}
+
+#filesystem li>ul {
+    margin-left: 1.5rem;
+}

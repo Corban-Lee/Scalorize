@@ -5,8 +5,10 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='images/spider-white.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-icons.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 </head>
 <body data-bs-theme="light">
     <nav class="navbar navbar-expand-lg bg-body-secondary">
@@ -24,19 +26,21 @@
                         <form class="d-flex flex-grow-1 mt-2 mt-lg-0 mb-3 mb-lg-0" role="search" id="searchForm">
                             <div class="input-group bg-body-tertiary rounded">
                                 <input type="search" class="form-control bg-transparent border-0" placeholder="https://example.com">
-                                <button class="btn border-0" type="submit">
-                                    <i class="bi bi-search"></i>
-                                </button>
+                                <div class="bg-body-secondary">
+                                    <button class="btn btn-body-tertiary rounded-start-0" type="submit">
+                                        <i class="bi bi-search"></i>
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     </li>
                     <li class="nav-item">
-                        <button class="btn border-0 bg-body-tertiary ms-0 ms-lg-3" type="button">
+                        <button class="btn btn-body-tertiary ms-0 ms-lg-3" type="button" data-bs-toggle="modal" data-bs-target="#optionsModal">
                             <i class="bi bi-gear"></i>
                         </button>
                     </li>
                     <li class="nav-item">
-                        <button class="btn border-0 bg-body-tertiary ms-0 ms-lg-3" type="button" id="themeBtn">
+                        <button class="btn btn-body-tertiary ms-0 ms-lg-3" type="button" id="themeBtn">
                             <i class="bi bi-moon-stars"></i>
                         </button>
                     </li>
@@ -45,58 +49,57 @@
         </div>
     </nav>
 
-    <main class="container pt-4 pb-5">
+    <main class="mx-4 pt-4 pb-5">
         <div class="row">
-            <div class="col-md-4 d-none">
-                <div class="row">
-                    <div class="col-12 mb-4">
-                        <div class="p-4 rounded bg-body-secondary">
-                            <h1 class="h2 font-monospace text-uppercase fst-italic">Instructions</h1>
-                            <ol class="ps-3 pb-3">
-                                <li>Enter a URL into the address bar</li>
-                                <li>Press [Enter] or click the search button</li>
-                                <li>Your results will appear on the right!</li>
-                                <li>Click on a resulting image to enlarge it</li>
-                            </ol>
-                            <p class="small text-body-secondary">
-                                WebShot is an open source software developed by Corban-Lee Jones.
-                                It is distributed under the [LICENSE] license, which governs it's usage and distrobution.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="p-4 rounded bg-body-secondary">
-                            <h3 class="h3 font-monospace text-uppercase fst-italic">Options</h3>
-                            <form id="optionsForm">
-                                <div>
-                                    <label class="mb-2">Resolutions</label>
-                                    <div class="d-flex align-items-center input-group mb-3">
-                                        <input type="number" name="widthRes" id="widthRes" class="form-control bg-body-tertiary rounded" placeholder="width">
-                                        <span class="mx-2 fs-4">
-                                            <i class="bi bi-x"></i>
-                                        </span>
-                                        <input type="number" name="heightRes" id="heightRes" class="form-control bg-body-tertiary rounded" placeholder="height">
-                                        <button type="button" class="btn border-0 shadow-0 bg-body-tertiary rounded ms-3" id="addResolution" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Add Resolution">
-                                            <i class="bi bi-plus"></i>
-                                        </button>
-                                    </div>
-                                    <div class="border rounded bg-body-tertiary pt-2 d-flex flex-wrap" id="resolutionsTray" style="min-height: 56px;">
-
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+            <!-- <div class="col-md-12 mb-4">
+                <div class="px-4 py-3 rounded bg-body-secondary">
+                    <nav id="breadcrumbs">
+                        <ol class="breadcrumb mb-0 font-monospace fw-semibold">
+                            <li class="breadcrumb-item">output</li>
+                            <li class="breadcrumb-item">derventioeducation.com</li>
+                            <li class="breadcrumb-item">case-studies</li>
+                            <li class="breadcrumb-item">archive</li>
+                            <li class="breadcrumb-item active">1920x1080.png</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div> -->
+            <div class="col-xl-3 col-lg-4 col-md-5 mb-4">
+                <div class="p-4 rounded bg-body-secondary">
+                    <nav id="filesystem">
+                        <ul></ul>
+                    </nav>
                 </div>
             </div>
-            <!-- col-md-8 -->
-            <div class="col-12"> 
-                <div class="row" id="outputRow">
-
-                </div>
+            <div class="col-xl-9 col-lg-8 col-md-7 mb-4">
+                <div class="row" id="outputRow"></div>
             </div>
         </div>
     </main>
+
+    <div class="modal fade" id="optionsModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title fs-5">Options</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="optionsForm">
+                    <div class="modal-body">
+                        <label for="resolutions" class="form-label">Resolutions</label>
+                        <select name="resolutions" id="resolutions" multiple class="form-select">
+                            <option value="1920x1080">1920x1080</option>
+                            <option value="1080x1080">1080x1080</option>
+                            <option value="360x640">360x640</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>

@@ -1,8 +1,11 @@
 """Scraping processes for the application."""
 
+import re
+import time
 from pathlib import Path
 from urllib.parse import urljoin, urlparse, ParseResult
 from typing import Generator
+from collections import deque
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -35,7 +38,7 @@ class Scraper:
         Creates and returns an absolute URL from the given base and relative URLs.
     """
 
-    def __init__(self, resolutions: tuple[str] = ("1920x1080", "1080x1080")):
+    def __init__(self, resolutions: tuple[str] = ("1600x900", "1920x1080", "2560x1440")):
         driver_path = "drivers/chrome-win32.exe"
         options = Options()
         options.add_argument("--headless")
@@ -44,7 +47,7 @@ class Scraper:
         self.resolutions = resolutions
         self.initial_url: ParseResult = None
         self.visited_urls = set()
-        self.url_queue = []
+        self.url_queue = deque()
 
     def stream_screenshots_generator(self, url: str) -> Generator[str, None, None]:
         """
@@ -67,14 +70,11 @@ class Scraper:
         # A clean slate is required to avoid conflicts with previous streams
         self.visited_urls.clear()
 
-        def generate():
-            screenshots_group = self.process_url_queue()
+        while self.url_queue:
+            screenshots = self.process_url_queue()
 
-            for group in screenshots_group:
-                for screenshot in group:
-                    yield f"data: {str(screenshot)}\n\n"
-
-        return generate()
+            for screenshot in screenshots:
+                yield f"data: {str(screenshot)}\n\n"
 
     def process_url_queue(self):
         """
@@ -86,10 +86,8 @@ class Scraper:
             A relative path of the most recently taken screenshot.
         """
 
-        screenshots = []
-
         while self.url_queue:
-            url = self.url_queue.pop(0)
+            url = self.url_queue.popleft()
 
             if url in self.visited_urls:
                 continue
@@ -103,12 +101,19 @@ class Scraper:
 
             self.visited_urls.add(url)
 
+            start = time.time()
+
             # capture screenshot of the current page
-            screenshot_paths = self.capture()
-            screenshots.extend(screenshot_paths)
-            yield screenshot_paths
+            for capture in self.capture():
+                yield capture
+
+            print(f"Screenshots taken in {time.time() - start:.2f} seconds.")
+
+            start = time.time()
 
             self.scrape_urls_to_queue(url)
+
+            print(f"Urls scraped in {time.time() - start:.2f} seconds.")
 
     def scrape_urls_to_queue(self, url: str) -> None:
         """
@@ -127,6 +132,7 @@ class Scraper:
             return url.removesuffix("#").removesuffix("/")
 
         hrefs = [anchor_tag.get_attribute("href") for anchor_tag in self.get_anchor_tags()]
+
         for href in hrefs:
             if not href:
                 continue
@@ -153,14 +159,12 @@ class Scraper:
         """
 
         parsed_url = urlparse(self.driver.current_url)
+        screenshot_safe_path = re.sub(r"[^a-zA-Z0-9%s]+" % re.escape(safe_characters), "", parsed_url.path).lstrip("/")
 
-        screenshot_safe_path = "".join(c for c in parsed_url.path if c.isalnum() or c in safe_characters).rstrip()
-        screenshot_safe_path = screenshot_safe_path.removeprefix("/")
+        screeshot_folder = Path(relative_path, parsed_url.netloc, screenshot_safe_path)
+        screeshot_folder.mkdir(parents=True, exist_ok=True)
 
-        screenshot_folder = Path(relative_path / parsed_url.netloc / screenshot_safe_path)
-        screenshot_folder.mkdir(parents=True, exist_ok=True)
-
-        return screenshot_folder
+        return screeshot_folder
 
     def capture(self) -> str:
         """
@@ -174,23 +178,19 @@ class Scraper:
 
         try:
             # The output path contains all output files
-            output_path = Path(Path.cwd() / "output/")
+            output_path = Path("output/")
             output_path.mkdir(exist_ok=True)
 
-            safe_characters = [*" ._/-"]
+            safe_characters = " ._/-"
             screenshot_folder = self.create_screenshot_folder(output_path, safe_characters)
 
-            relative_paths = []
             for resolution in self.resolutions:
-                width, height = resolution.split("x")
+                width, height = map(int, resolution.split("x"))
+                self.driver.set_window_size(width, height)
+
                 filename = screenshot_folder / f"{resolution}.png"
-
-                self.driver.set_window_size(int(width), int(height))
                 self.driver.save_screenshot(filename)
-
-                relative_paths.append("output/" / Path(filename).relative_to(output_path))
-
-            return relative_paths
+                yield filename
 
         except WebDriverException as error:
             print(f"Error capturing screenshots: {error}")
@@ -231,10 +231,7 @@ class Scraper:
             The constructed absolute URL.
         """
 
-        parsed_base_url = urlparse(base_url)
-        parsed_relative_url = urlparse(relative_url)
-
-        if parsed_relative_url.scheme:
+        if relative_url.startswith(("http://", "https://")):
             return relative_url
-    
-        return urljoin(parsed_base_url.geturl(), relative_url)
+
+        return urljoin(base_url, relative_url)

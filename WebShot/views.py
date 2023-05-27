@@ -1,7 +1,5 @@
 """Handle views for the application."""
 
-from urllib.parse import unquote
-
 from flask import Blueprint, render_template, request, Response, send_file, make_response
 from scrape import Scraper
 
