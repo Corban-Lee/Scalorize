@@ -18,8 +18,6 @@ $("#searchForm").submit(function(e) {
         return;
     }
 
-    alert("searching");
-
     var eventSource = new EventSource("/stream-screenshots?url=" + encodeURIComponent(url));
     eventSource.onmessage = function(event) {
         const screenshotPath = event.data;
@@ -100,95 +98,35 @@ function addResolution() {
     `);
 }
 
-var filesystem = [
-    // {
-    //     name: "https://derventioeducation.com",
-    //     type: "folder",
-    //     children: [
-    //         {
-    //             name: "1920x1080.png",
-    //             type: "file"
-    //         },
-    //         {
-    //             name: "360x640.png",
-    //             type: "file"
-    //         },
-    //         {
-    //             name: "case-studies",
-    //             type: "folder",
-    //             children: [
-    //                 {
-    //                     name: "1920x1080.png",
-    //                     type: "file"
-    //                 },
-    //                 {
-    //                     name: "360x640.png",
-    //                     type: "file"
-    //                 }
-    //             ]
-    //         }
-    //     ]
-    // },
-    // {
-    //     name: "https://stackoverflow.com",
-    //     type: "folder",
-    //     children: [
-    //         {
-    //             name: "1920x1080.png",
-    //             type: "file"
-    //         },
-    //         {
-    //             name: "360x640.png",
-    //             type: "file"
-    //         },
-    //         {
-    //             name: "questions",
-    //             type: "folder",
-    //             children: [
-    //                 {
-    //                     name: "1920x1080.png",
-    //                     type: "file"
-    //                 },
-    //                 {
-    //                     name: "360x640.png",
-    //                     type: "file"
-    //                 }
-    //             ]
-    //         }
-    //     ]
-    // }
-];
-
-$(document).ready(() => {
-    loadFolder(filesystem);
-});
+var filesystem = [];
 
 function loadFolder(filesList, parent=$("#filesystem ul").first()) {
 
-    parent.html("");
-
     filesList.forEach((item) => {
-        console.log(JSON.stringify(item, null, 4))
         if (item.type === "file") {
             parent.append(`
                 <li>
-                    <i class="bi bi-filetype-png"></i>
-                    ${item.name}
+                    <a class="text-body text-decoration-none" href="${item.path}" target="_blank">
+                        <i class="bi bi-filetype-png"></i>
+                        ${item.name}
+                    </a>
                 </li>
             `);
         }
         else if (item.type === "folder") {
             const newParent = $(`
                 <li>
-                    <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#collapseFolder-${item.name}" role="button">
                         <i class="bi bi-folder me-2"></i>
                         ${item.name}
                         <i class="bi bi-chevron-down ms-auto"></i>
                     </div>
-                    <ul></ul>
+                    <ul class="collapse" id="collapseFolder-${item.name}"></ul>
                 </li>
-            `).appendTo(parent).find("ul").first();
-            loadFolder(item.children, newParent);
+            `).appendTo(parent);
+
+            const childList = newParent.find("ul").first();
+            loadFolder(item.children, childList);
         }
     });
 }
@@ -196,8 +134,6 @@ function loadFolder(filesList, parent=$("#filesystem ul").first()) {
 function addItemToFileTree(data, parentElement=$("#filesystem ul").first()) {
     const parts = data.split("\\").filter((part) => part !== "");
     var currentFolder = filesystem;
-
-    console.log(parts);
 
     for (var i = 1; i < parts.length; i++) {
         const part = parts[i];
@@ -211,13 +147,12 @@ function addItemToFileTree(data, parentElement=$("#filesystem ul").first()) {
             else {
                 currentFolder = existingItem.children
             }
-            console.log(true);
         }
         else {
-            console.log(true);
             const newItem = {
                 name: part,
                 type: i === parts.length - 1 ? "file" : "folder",
+                path: data,
                 children: []
             };
 
@@ -226,5 +161,7 @@ function addItemToFileTree(data, parentElement=$("#filesystem ul").first()) {
         }
     }
 
-    loadFolder(filesystem);
+    const parent = parentElement || $("#filesystem ul").first();
+    parent.html("");
+    loadFolder(filesystem, parent);
 }
