@@ -12,7 +12,7 @@
 </head>
 <body data-bs-theme="light">
     <nav class="navbar navbar-expand-lg bg-body-secondary">
-        <div class="container">
+        <div class="px-4 d-flex w-100">
             <a href="/" class="navbar-brand fs-2 d-flex align-items-center me-4 text-uppercase fst-italic font-monospace" id="brand">
                 <img src="{{ url_for('static', filename='images/spider.png') }}" alt="WebShot Logo" width="35px" class="me-2">
                 WebShot
@@ -49,27 +49,27 @@
         </div>
     </nav>
 
-    <main class="mx-4 pt-4 pb-5">
+    <main class="pb-5">
         <div class="row">
-            <div class="col-md-12 mb-4">
-                <div class="px-4 py-3 rounded bg-body-secondary">
+            <div class="col-md-12">
+                <div class="px-4 py-3 bg-body-secondary d-flex font-monospace fw-semibold">
                     <nav id="breadcrumbs">
-                        <ol class="breadcrumb mb-0 font-monospace fw-semibold">
+                        <ol class="breadcrumb mb-0">
                         </ol>
                     </nav>
+                    <span class="ms-auto" id="timer">Not Started</span>
                 </div>
             </div>
             <div class="col-xl-3 col-lg-4 col-md-5 mb-4">
-                <div class="p-4 rounded bg-body-secondary">
-                    <nav class="filetree">
-                        <h3 class="h5">Placeholders</h3>
-                        <hr>
+                <div class="rounded-bottom rounded-top-0 rounded-start-0 bg-body-secondary">
+                    <hr class="m-0">
+                    <nav class="filetree p-3">
                         <ul class="filetree-container"></ul>
                     </nav>
                 </div>
             </div>
             <div class="col-xl-9 col-lg-8 col-md-7 mb-4">
-                <div class="row" id="outputRow"></div>
+                <div class="row mt-4 me-4" id="outputRow"></div>
             </div>
         </div>
     </main>

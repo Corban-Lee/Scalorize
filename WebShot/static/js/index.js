@@ -18,10 +18,24 @@ $("#searchForm").submit(function(e) {
         return;
     }
 
+    var second = 0
+    var timerInterval = setInterval(() => {
+        second ++;
+        $("#timer").text(second + " seconds elapsed") 
+    }, 1000);
+
     var eventSource = new EventSource("/stream-screenshots?url=" + encodeURIComponent(url));
     eventSource.onmessage = function(event) {
-        const screenshotPath = event.data;
-        createFileTreeItem(screenshotPath);
+        if (event.data === "DONE") {
+            clearInterval(timerInterval);
+            return;
+        }
+
+        const data = JSON.parse(event.data);
+        const screenshotPath = data.screenshotPath.replace(/\//g, '\\');
+        const browserType = data.browser;
+
+        createFileTreeItem(screenshotPath, browserType);
         $("#outputRow").append(`
             <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6 mb-4">
                 <a type="button" href="${screenshotPath}" target="_blank">
@@ -64,88 +78,13 @@ function loadTheme(theme) {
     }
 }
 
-// var filesystem = [];
-
-// function loadFolder(filesList, parent=$("nav.filetree > ul.filetree-container").first()) {
-
-//     filesList.forEach((item, i) => {
-//         if (item.type === "file") {
-//             parent.append(`
-//                 <li>
-//                     <a class="text-body text-decoration-none" href="${item.path}" target="_blank">
-//                         <div class="filetree-item">
-//                             <i class="bi bi-browser-chrome me-1"></i>
-//                             ${item.name}
-//                         </div>
-//                     </a>
-//                 </li>
-//             `);
-//         }
-//         else if (item.type === "folder") {
-//             const newParent = $(`
-//                 <li>
-//                     <div class="filetree-item" data-bs-toggle="collapse" data-bs-target="#collapseFolder-${item.name}" role="button">
-//                         <i class="bi bi-folder me-2"></i>
-//                         ${item.name}
-//                         <i class="bi bi-chevron-down ms-auto"></i>
-//                     </div>
-//                     <ul class="collapse filetree-container show" id="collapseFolder-${item.name}"></ul>
-//                 </li>
-//             `).appendTo(parent);
-
-//             const childList = newParent.find("ul.filetree-container").first();
-//             // if (i == 0) {
-//             //     childList.addClass("show")
-//             // }
-
-//             loadFolder(item.children, childList);
-//         }
-//     });
-// }
-
-// function addItemToFileTree(data, parentElement=$("nav.filetree > ul.filetree-container").first()) {
-//     const parts = data.split("\\").filter((part) => part !== "");
-//     var currentFolder = filesystem;
-
-//     for (var i = 1; i < parts.length; i++) {
-//         const part = parts[i];
-
-//         const existingItem = currentFolder.find((item) => item.name === part);
-
-//         if (existingItem) {
-//             if (i === parts.length - 1) {
-//                 existingItem.type = "file"
-//             }
-//             else {
-//                 currentFolder = existingItem.children
-//                 parentElement = $(`#collapsableFolder-${part}`);
-//             }
-//         }
-//         else {
-//             const newItem = {
-//                 name: part,
-//                 type: i === parts.length - 1 ? "file" : "folder",
-//                 path: data,
-//                 children: []
-//             };
-
-//             currentFolder.push(newItem);
-//             currentFolder = newItem.children;
-//         }
-//     }
-
-//     const parent = typeof parentElement == "undefined" ? $("nav.filetree ul.filetree-container").first() : parentElement;
-//     parent.html("");
-//     loadFolder(filesystem, parent);
-// }
-
 function showFileTreeItem(item, parent) {
     if (item.type === "file") {
             parent.append(`
                 <li>
                     <a class="text-body text-decoration-none" href="output/${item.path}" target="_blank">
                         <div class="filetree-item">
-                            <i class="bi bi-browser-chrome me-1"></i>
+                            <i class="bi bi-browser-${item.browserType} me-1"></i>
                             ${item.name}
                         </div>
                     </a>
@@ -166,7 +105,7 @@ function showFileTreeItem(item, parent) {
     }
 }
 
-function createFileTreeItem(data) {
+function createFileTreeItem(data, browserType) {
     const parts = data.split("\\").filter((part) => part !== "").slice(1);
 
     $("#breadcrumbs ol").html("");
@@ -192,7 +131,8 @@ function createFileTreeItem(data) {
             type: type,
             path: path,
             safePath: safePath,
-            children: []
+            children: [],
+            browserType: browserType
         }
 
         if (exists) {
@@ -201,7 +141,6 @@ function createFileTreeItem(data) {
         else {
             var parent = $("nav.filetree ul.filetree-container").first();
         }
-        // console.log(parent.length + " " + i + " " + JSON.stringify(item));
         showFileTreeItem(item, parent)
     }
 }

@@ -51,7 +51,7 @@ class Scraper:
         self.visited_urls = set()
         self.url_queue = MPQueue()
 
-    def stream_screenshots_generator(self, url: str) -> Generator[str, None, None]:
+    def stream_screenshots_generator(self, url: str, browser="chrome") -> Generator[str, None, None]:
         """
         Streams a generator of screenshots from the given url.
 
@@ -79,7 +79,10 @@ class Scraper:
             screenshots = self.process_url(driver, url)
             for screenshot in screenshots:
                 if screenshot:
-                    yield f"data: {str(screenshot)}\n\n"
+                    yield f'data: {{"screenshotPath": "{str(screenshot)}", "browser": "{browser}"}}\n\n'.replace("\\", "/")
+
+
+        yield f"data: DONE\n\n"
 
     def process_url(self, driver, url: str):
         """
