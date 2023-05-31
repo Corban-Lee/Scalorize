@@ -14,15 +14,32 @@
     white-space: nowrap;
 }
 
-#filesystem ul {
+ul.filetree-container {
     list-style: none;
     padding-left: 0;
+    margin-bottom: 0;
 }
 
-#filesystem ul>li {
+ul.filetree-container li {
     margin-top: 0.2rem;
 }
 
-#filesystem li>ul {
+li ul.filetree-container {
     margin-left: 1.5rem;
+}
+
+li div.filetree-item {
+    display: flex;
+    align-items: center;
+
+    border-radius: var(--bs-border-radius);
+    padding: 0.2rem 0.5rem;
+
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+}
+
+li div.filetree-item:hover {
+    background-color: rgb(var(--bs-tertiary-bg-rgb));
 }

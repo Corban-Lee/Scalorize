@@ -21,7 +21,7 @@ $("#searchForm").submit(function(e) {
     var eventSource = new EventSource("/stream-screenshots?url=" + encodeURIComponent(url));
     eventSource.onmessage = function(event) {
         const screenshotPath = event.data;
-        addItemToFileTree(screenshotPath);
+        createFileTreeItem(screenshotPath);
         $("#outputRow").append(`
             <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6 mb-4">
                 <a type="button" href="${screenshotPath}" target="_blank">
@@ -64,104 +64,144 @@ function loadTheme(theme) {
     }
 }
 
-$("#addResolution").on("click", (e) => {
-    e.preventDefault();
-    addResolution();
-});
+// var filesystem = [];
 
-function addResolution() {
+// function loadFolder(filesList, parent=$("nav.filetree > ul.filetree-container").first()) {
 
-    const width = $("#widthRes").val();
-    const height = $("#heightRes").val();
+//     filesList.forEach((item, i) => {
+//         if (item.type === "file") {
+//             parent.append(`
+//                 <li>
+//                     <a class="text-body text-decoration-none" href="${item.path}" target="_blank">
+//                         <div class="filetree-item">
+//                             <i class="bi bi-browser-chrome me-1"></i>
+//                             ${item.name}
+//                         </div>
+//                     </a>
+//                 </li>
+//             `);
+//         }
+//         else if (item.type === "folder") {
+//             const newParent = $(`
+//                 <li>
+//                     <div class="filetree-item" data-bs-toggle="collapse" data-bs-target="#collapseFolder-${item.name}" role="button">
+//                         <i class="bi bi-folder me-2"></i>
+//                         ${item.name}
+//                         <i class="bi bi-chevron-down ms-auto"></i>
+//                     </div>
+//                     <ul class="collapse filetree-container show" id="collapseFolder-${item.name}"></ul>
+//                 </li>
+//             `).appendTo(parent);
 
-    if (!width | !height) {
-        return;
-    }
+//             const childList = newParent.find("ul.filetree-container").first();
+//             // if (i == 0) {
+//             //     childList.addClass("show")
+//             // }
 
-    var exists = false;
-    $("#resolutionsTray .res-item").each(function() {
-        const [existingWidth, existingHeight] = $(this).find("span").text().split("x");
-        exists = existingWidth == width & existingHeight == height;
-    });
+//             loadFolder(item.children, childList);
+//         }
+//     });
+// }
 
-    if (exists) {
-        return;
-    }
+// function addItemToFileTree(data, parentElement=$("nav.filetree > ul.filetree-container").first()) {
+//     const parts = data.split("\\").filter((part) => part !== "");
+//     var currentFolder = filesystem;
 
-    $("#resolutionsTray").append(`
-        <div class="border rounded bg-body-emphasis d-flex align-items-center mx-2 mb-2 res-item" data-width="${width}" data-height="${height}">
-            <span class="ms-2 me-1">${width}x${height}</span>
-            <button class="btn border-0 shadow-0" type="button" onclick="$(this).parent().remove()">
-                <i class="bi bi-x"></i>
-            </button>
-        </div>
-    `);
-}
+//     for (var i = 1; i < parts.length; i++) {
+//         const part = parts[i];
 
-var filesystem = [];
+//         const existingItem = currentFolder.find((item) => item.name === part);
 
-function loadFolder(filesList, parent=$("#filesystem ul").first()) {
+//         if (existingItem) {
+//             if (i === parts.length - 1) {
+//                 existingItem.type = "file"
+//             }
+//             else {
+//                 currentFolder = existingItem.children
+//                 parentElement = $(`#collapsableFolder-${part}`);
+//             }
+//         }
+//         else {
+//             const newItem = {
+//                 name: part,
+//                 type: i === parts.length - 1 ? "file" : "folder",
+//                 path: data,
+//                 children: []
+//             };
 
-    filesList.forEach((item) => {
-        if (item.type === "file") {
+//             currentFolder.push(newItem);
+//             currentFolder = newItem.children;
+//         }
+//     }
+
+//     const parent = typeof parentElement == "undefined" ? $("nav.filetree ul.filetree-container").first() : parentElement;
+//     parent.html("");
+//     loadFolder(filesystem, parent);
+// }
+
+function showFileTreeItem(item, parent) {
+    if (item.type === "file") {
             parent.append(`
                 <li>
-                    <a class="text-body text-decoration-none" href="${item.path}" target="_blank">
-                        <i class="bi bi-filetype-png"></i>
-                        ${item.name}
+                    <a class="text-body text-decoration-none" href="output/${item.path}" target="_blank">
+                        <div class="filetree-item">
+                            <i class="bi bi-browser-chrome me-1"></i>
+                            ${item.name}
+                        </div>
                     </a>
                 </li>
             `);
         }
-        else if (item.type === "folder") {
-            const newParent = $(`
-                <li>
-                    <div class="d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#collapseFolder-${item.name}" role="button">
-                        <i class="bi bi-folder me-2"></i>
-                        ${item.name}
-                        <i class="bi bi-chevron-down ms-auto"></i>
-                    </div>
-                    <ul class="collapse" id="collapseFolder-${item.name}"></ul>
-                </li>
-            `).appendTo(parent);
-
-            const childList = newParent.find("ul").first();
-            loadFolder(item.children, childList);
-        }
-    });
+    else if (item.type === "folder") {
+        parent.append($(`
+            <li data-path="${item.path}">
+                <div class="filetree-item" data-bs-toggle="collapse" data-bs-target="#collapseFolder-${item.path}" role="button">
+                    <i class="bi bi-folder me-2"></i>
+                    ${item.name}
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </div>
+                <ul class="collapse filetree-container" id="collapseFolder-${item.path}"></ul>
+            </li>
+        `));
+    }
 }
 
-function addItemToFileTree(data, parentElement=$("#filesystem ul").first()) {
-    const parts = data.split("\\").filter((part) => part !== "");
-    var currentFolder = filesystem;
+function createFileTreeItem(data) {
+    const parts = data.split("\\").filter((part) => part !== "").slice(1);
 
-    for (var i = 1; i < parts.length; i++) {
-        const part = parts[i];
+    $("#breadcrumbs ol").html("");
 
-        const existingItem = currentFolder.find((item) => item.name === part);
+    for (var i = 0; i < parts.length; i++) {
+        const part = parts[i]
 
-        if (existingItem) {
-            if (i === parts.length - 1) {
-                existingItem.type = "file"
-            }
-            else {
-                currentFolder = existingItem.children
-            }
+        $("#breadcrumbs ol").append(`<li class="breadcrumb-item">${part}</li>`);
+
+        const type = i === parts.length - 1 ? "file" : "folder";
+        var path = parts.slice(0, i + 1).join("/");
+        const safePath = path.replace(/[.\/]/g, '\\$&')
+        const parentPath = parts.slice(0, i).join("/");
+        const safeParentPath = parentPath.replace(/[.\/]/g, '\\$&');
+        const exists = $(`#collapseFolder-${safeParentPath}`).length > 0;
+        
+        if ($(`li[data-path="${path}"]`).length !== 0) {
+            continue;
+        }
+
+        var item = {
+            name: part,
+            type: type,
+            path: path,
+            safePath: safePath,
+            children: []
+        }
+
+        if (exists) {
+            var parent = $(`#collapseFolder-${safeParentPath}`);
         }
         else {
-            const newItem = {
-                name: part,
-                type: i === parts.length - 1 ? "file" : "folder",
-                path: data,
-                children: []
-            };
-
-            currentFolder.push(newItem);
-            currentFolder = newItem.children;
+            var parent = $("nav.filetree ul.filetree-container").first();
         }
+        // console.log(parent.length + " " + i + " " + JSON.stringify(item));
+        showFileTreeItem(item, parent)
     }
-
-    const parent = parentElement || $("#filesystem ul").first();
-    parent.html("");
-    loadFolder(filesystem, parent);
 }
