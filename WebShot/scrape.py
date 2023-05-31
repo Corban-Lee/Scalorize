@@ -93,12 +93,15 @@ class Scraper:
             A relative path of the most recently taken screenshot.
         """
 
-        # check we are still on the same domain and not in a visited domain
-        if urlparse(url).netloc != self.initial_url.netloc or url in self.visited_urls:
+        if url in self.visited_urls:
             return
 
         # load the current page
         driver.get(url)
+
+        # Check after going to the page to catch redirects
+        if urlparse(driver.current_url).netloc != self.initial_url.netloc or driver.current_url in self.visited_urls:
+            return
 
         print(url == driver.current_url)
 
