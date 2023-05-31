@@ -18,6 +18,7 @@ $("#searchForm").submit(function(e) {
         return;
     }
 
+    var pagesProcessed = 0;
     var second = 0
     var timerInterval = setInterval(() => {
         second ++;
@@ -26,10 +27,13 @@ $("#searchForm").submit(function(e) {
 
     var eventSource = new EventSource("/stream-screenshots?url=" + encodeURIComponent(url));
     eventSource.onmessage = function(event) {
-        if (event.data === "DONE") {
+        if (event.data === "DONE") { // move this to the error event handler with no DONE status message
             clearInterval(timerInterval);
             return;
         }
+
+        pagesProcessed ++;
+        $("#pagesProcessed").text(`${pagesProcessed} pages processed`)
 
         const data = JSON.parse(event.data);
         const screenshotPath = data.screenshotPath.replace(/\//g, '\\');
@@ -80,7 +84,7 @@ function loadTheme(theme) {
 
 function showFileTreeItem(item, parent) {
     if (item.type === "file") {
-            parent.append(`
+            parent.prepend(`
                 <li>
                     <a class="text-body text-decoration-none" href="output/${item.path}" target="_blank">
                         <div class="filetree-item">
@@ -99,7 +103,7 @@ function showFileTreeItem(item, parent) {
                     ${item.name}
                     <i class="bi bi-chevron-down ms-auto"></i>
                 </div>
-                <ul class="collapse filetree-container" id="collapseFolder-${item.path}"></ul>
+                <ul class="collapse filetree-container ${item.show}" id="collapseFolder-${item.path}"></ul>
             </li>
         `));
     }
@@ -132,7 +136,8 @@ function createFileTreeItem(data, browserType) {
             path: path,
             safePath: safePath,
             children: [],
-            browserType: browserType
+            browserType: browserType,
+            show: i === 0 ? "show" : ""
         }
 
         if (exists) {
