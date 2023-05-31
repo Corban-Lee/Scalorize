@@ -51,6 +51,29 @@ class Scraper:
         self.visited_urls = set()
         self.url_queue = MPQueue()
 
+    def get_driver(self, browser: str):
+
+        match browser:
+
+            case "chrome":
+                options = webdriver.ChromeOptions
+                driver = webdriver.Chrome
+                driver_path = "drivers/chromedriver-win32.exe"
+
+            case "firefox":
+                options = webdriver.FirefoxOptions
+                driver = webdriver.Firefox
+                driver_path = "drivers/"
+
+            case _:
+                raise ValueError(f"Invalid browser: {browser}")
+
+        options = options()
+        options.add_argument("--headless")
+
+        return driver(driver_path, options=options)
+
+
     def stream_screenshots_generator(self, url: str, browser="chrome") -> Generator[str, None, None]:
         """
         Streams a generator of screenshots from the given url.
@@ -72,11 +95,11 @@ class Scraper:
         # A clean slate is required to avoid conflicts with previous streams
         self.visited_urls.clear()
 
-        driver = self.driver()
+        driver = self.get_driver(browser)
 
         while not self.url_queue.empty():
             url = self.url_queue.get()
-            screenshots = self.process_url(driver, url)
+            screenshots = self.process_url(driver, url, browser)
             for screenshot in screenshots:
                 if screenshot:
                     yield f'data: {{"screenshotPath": "{str(screenshot)}", "browser": "{browser}"}}\n\n'.replace("\\", "/")
@@ -84,7 +107,7 @@ class Scraper:
 
         yield f"data: DONE\n\n"
 
-    def process_url(self, driver, url: str):
+    def process_url(self, driver, url: str, browser: str):
         """
 
         Yields
@@ -103,14 +126,12 @@ class Scraper:
         if urlparse(driver.current_url).netloc != self.initial_url.netloc or driver.current_url in self.visited_urls:
             return
 
-        print(url == driver.current_url)
-
         self.visited_urls.add(url)
 
         start = time.time()
 
         # capture screenshot of the current page    
-        for capture in self.capture(driver):
+        for capture in self.capture(driver, browser):
             yield capture
 
         print(f"Screenshots taken in {time.time() - start:.2f} seconds.")
@@ -172,7 +193,7 @@ class Scraper:
 
         return screeshot_folder
 
-    def capture(self, driver) -> str:
+    def capture(self, driver, browser: str) -> str:
         """
         Captures a screenshot and saves it to disk.
 
@@ -194,7 +215,7 @@ class Scraper:
                 width, height = map(int, resolution.split("x"))
                 driver.set_window_size(width, height)
 
-                filename = screenshot_folder / f"{resolution}.png"
+                filename = screenshot_folder / f"{resolution} {browser.title()}.png"
                 driver.save_screenshot(filename)
                 yield filename
 

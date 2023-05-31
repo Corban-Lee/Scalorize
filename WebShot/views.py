@@ -12,8 +12,8 @@ def index():
 @index_blueprint.route("/stream-screenshots")
 def stream_screenshots():
     url = request.args.get("url")
-    print("streaming from url: " + url)
-    response = make_response(Response(Scraper().stream_screenshots_generator(url), mimetype="text/event-stream"))
+    browser = request.args.get("browser")
+    response = make_response(Response(Scraper().stream_screenshots_generator(url, browser), mimetype="text/event-stream"))
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'

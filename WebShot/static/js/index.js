@@ -6,6 +6,11 @@ $(document).ready(() => {
     if (previousTheme) {
         loadTheme(previousTheme)
     }
+
+    const previousBrowser = localStorage.getItem("browser");
+    if (previousBrowser) {
+        setBrowser(previousBrowser);
+    }
 });
 
 $("#searchForm").submit(function(e) {
@@ -25,7 +30,7 @@ $("#searchForm").submit(function(e) {
         $("#timer").text(second + " seconds elapsed") 
     }, 1000);
 
-    var eventSource = new EventSource("/stream-screenshots?url=" + encodeURIComponent(url));
+    var eventSource = new EventSource("/stream-screenshots?url=" + encodeURIComponent(url) + "&browser=" + localStorage.getItem("browser"));
     eventSource.onmessage = function(event) {
         if (event.data === "DONE") { // move this to the error event handler with no DONE status message
             clearInterval(timerInterval);
@@ -40,14 +45,27 @@ $("#searchForm").submit(function(e) {
         const browserType = data.browser;
 
         createFileTreeItem(screenshotPath, browserType);
+
+        const fileName = screenshotPath.split("\\").slice(-1)[0];
+        console.log(JSON.stringify(fileName))
+        var [width, height] = fileName.replace(".png", "").split(/x(.*)/s);
+
         $("#outputRow").append(`
-            <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6 mb-4">
+            <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6 mb-4">
+                <div class="position-relative">
                 <a type="button" href="${screenshotPath}" target="_blank">
-                    <img src="${screenshotPath}" class="w-100 rounded shadow"/>
-                </a>
+                    <div class="position-absolute top-0 start-0 m-1 bg-opacity-50 badge bg-secondary">
+                        ${width} x ${height}
+                    </div>
+                    <img src="${screenshotPath}" class="w-100 rounded shadow-sm"/>
+                    </a>
+                </div>
             </div>
         `);
     }
+                // <div class="position-absolute top-0 end-0 m-1 bg-opacity-50 badge bg-secondary">
+                //     ${browserType}
+                // </div>
     eventSource.onerror = function() {
         console.error("An error occured while trying to connect [eventsource]");
         eventSource.close();
@@ -65,6 +83,25 @@ $("#themeBtn").on("click", function() {
 
     loadTheme(oppositeTheme);
 });
+
+$("#browserBtn").on("click", function() {
+    const currentBrowser = localStorage.getItem("browser");
+    const oppositeBrowser = currentBrowser == "chrome" ? "firefox" : "chrome";
+    localStorage.setItem("browser", oppositeBrowser);
+
+    setBrowser(oppositeBrowser);
+});
+
+function setBrowser(browser) {
+    const icon = $("#browserBtn").find("i.bi");
+
+    if (browser === "chrome") {
+        icon.removeClass("bi-browser-firefox").addClass("bi-browser-chrome");
+    }
+    else {
+        icon.removeClass("bi-browser-chrome").addClass("bi-browser-firefox");       
+    }
+}
 
 function loadTheme(theme) {
     localStorage.setItem("theme", theme);
@@ -84,28 +121,28 @@ function loadTheme(theme) {
 
 function showFileTreeItem(item, parent) {
     if (item.type === "file") {
-            parent.prepend(`
+            parent.prepend($(`
                 <li>
                     <a class="text-body text-decoration-none" href="output/${item.path}" target="_blank">
                         <div class="filetree-item">
-                            <i class="bi bi-browser-${item.browserType} me-1"></i>
-                            ${item.name}
+                            <i class="bi bi-browser-${item.browserType} mx-2 text-body-emphasis"></i>
+                            <span class="filetree-item-name">${item.name}</span>
                         </div>
                     </a>
                 </li>
-            `);
+            `).css("--indent", item.indent));
         }
     else if (item.type === "folder") {
         parent.append($(`
             <li data-path="${item.path}">
                 <div class="filetree-item" data-bs-toggle="collapse" data-bs-target="#collapseFolder-${item.path}" role="button">
-                    <i class="bi bi-folder me-2"></i>
-                    ${item.name}
-                    <i class="bi bi-chevron-down ms-auto"></i>
+                    <i class="bi bi-chevron-down filetree-item-name"></i>
+                    <i class="bi bi-slash-lg mx-2 text-body-emphasis"></i>
+                    <span class="filetree-item-name">${item.name}</span>
                 </div>
                 <ul class="collapse filetree-container ${item.show}" id="collapseFolder-${item.path}"></ul>
             </li>
-        `));
+        `).css("--indent", item.indent));
     }
 }
 
@@ -137,7 +174,8 @@ function createFileTreeItem(data, browserType) {
             safePath: safePath,
             children: [],
             browserType: browserType,
-            show: i === 0 ? "show" : ""
+            show: i === 0 ? "show" : "",
+            indent: i + 1 + "rem"
         }
 
         if (exists) {

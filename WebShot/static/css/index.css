@@ -18,28 +18,29 @@ ul.filetree-container {
     list-style: none;
     padding-left: 0;
     margin-bottom: 0;
-}
-
-ul.filetree-container li {
-    margin-top: 0.2rem;
-}
-
-li ul.filetree-container {
-    margin-left: 1.5rem;
+    min-width: fit-content;
 }
 
 li div.filetree-item {
     display: flex;
     align-items: center;
+    flex-wrap: nowrap;
+    min-width: fit-content;
 
-    border-radius: var(--bs-border-radius);
+    /* border-radius: var(--bs-border-radius); */
     padding: 0.2rem 0.5rem;
+    padding-left: var(--indent);
 
     -webkit-user-select: none; /* Safari */
     -ms-user-select: none; /* IE 10 and IE 11 */
     user-select: none; /* Standard syntax */
 }
 
-li div.filetree-item:hover {
-    background-color: rgb(var(--bs-tertiary-bg-rgb));
+li div.filetree-item .filetree-item-name {
+    color: var(--bs-secondary-color);
+}
+
+li div.filetree-item:hover .filetree-item-name {
+    /* background-color: rgb(var(--bs-tertiary-bg-rgb)); */
+    color: var(--bs-emphasis-color);
 }

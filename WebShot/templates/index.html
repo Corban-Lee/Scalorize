@@ -35,12 +35,19 @@
                         </form>
                     </li>
                     <li class="nav-item">
-                        <button class="btn btn-body-tertiary ms-0 ms-lg-3" type="button" data-bs-toggle="modal" data-bs-target="#optionsModal">
-                            <i class="bi bi-gear"></i>
+                        <button class="btn btn-body-tertiary ms-0 ms-lg-3" type="button" id="browserBtn" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Browser">
+                            <i class="bi bi-browser-chrome"></i>
                         </button>
                     </li>
                     <li class="nav-item">
-                        <button class="btn btn-body-tertiary ms-0 ms-lg-3" type="button" id="themeBtn">
+                        <div class="ms-0 ms-lg-3" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Settings">
+                            <button class="btn btn-body-tertiary" type="button" data-bs-toggle="modal" data-bs-target="#optionsModal">
+                                <i class="bi bi-gear"></i>
+                            </button>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-body-tertiary ms-0 ms-lg-3" type="button" id="themeBtn" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Theme">
                             <i class="bi bi-moon-stars"></i>
                         </button>
                     </li>
@@ -50,9 +57,9 @@
     </nav>
 
     <main class="pb-5">
-        <div class="row">
+        <div class="row g-0">
             <div class="col-md-12">
-                <div class="px-4 py-3 bg-body-secondary d-flex font-monospace fw-semibold">
+                <div class="px-4 py-3 bg-body-secondary d-flex font-monospace fw-semibold border-bottom border-top">
                     <nav id="breadcrumbs">
                         <ol class="breadcrumb mb-0">
                         </ol>
@@ -62,16 +69,21 @@
                     <span id="timer">0 seconds elapsed</span>
                 </div>
             </div>
-            <div class="col-xl-3 col-lg-4 col-md-5 mb-4">
-                <div class="rounded-start-0 bg-body-secondary">
-                    <hr class="m-0">
-                    <nav class="filetree p-3">
+            <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-5 mb-4">
+                <div class="rounded-start-0 bg-body-secondary border-end border-bottom">
+                    <nav class="filetree py-3 overflow-x-auto">
                         <ul class="filetree-container"></ul>
                     </nav>
                 </div>
             </div>
-            <div class="col-xl-9 col-lg-8 col-md-7 mb-4">
-                <div class="row mt-4 me-4 font-monospace fw-semibold" id="outputRow"></div>
+            <div class="col-xxl-10 col-xl-9 col-lg-8 col-md-7 mb-4">
+                <div class="row mt-4 px-4 font-monospace fw-semibold" id="outputRow">
+                    <!-- <div class="col-12 mb-4">
+                        <div class="bg-body-secondary p-4 d-inline-block">
+                            <img src="output/derventioeducation.com/1920x1080.png" style="height: 400px;" alt="">
+                        </div>
+                    </div> -->
+                </div>
             </div>
         </div>
     </main>
