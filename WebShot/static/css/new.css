@@ -7,6 +7,7 @@
 body {
     font-family: "Helios";
     min-height: 100vh;
+    max-height: 100vh;
 }
 
 #root {
@@ -16,7 +17,7 @@ body {
     height: 100vh;
     max-height: 100vh;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: auto;
 }
 
 #sidebar {
@@ -41,10 +42,10 @@ body {
     width: fit-content;
 }
 
-.filetree-item {
-}
+/* .filetree-item {
+} */
 
-.filetree-item a, div {
+.filetree-item a, .filetree-item div {
     color: var(--bs-body-color);
     text-decoration: none;
     display: flex;
@@ -52,6 +53,10 @@ body {
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.filetree-item a i.bi, .filetree-item div i.bi {
+    transition: transform 0.3s ease;
 }
 
 .filetree-item ul {
