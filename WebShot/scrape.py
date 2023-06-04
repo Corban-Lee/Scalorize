@@ -65,6 +65,11 @@ class Scraper:
                 driver = webdriver.Firefox
                 driver_path = "drivers/"
 
+            case "edge":
+                options = webdriver.EdgeOptions
+                driver = webdriver.Edge
+                driver_path = "drivers/msedgedriver-win64"
+
             case _:
                 raise ValueError(f"Invalid browser: {browser}")
 

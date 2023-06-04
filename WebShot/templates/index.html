@@ -1,21 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>WebShot - Responsive Website Helper</title>
+    <title>Scalorize | Detect mobile scaling problems before they happen</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="{{ url_for('static', filename='images/spider-white.png') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/logo-alt.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-icons.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <style>
+        @font-face {
+            font-family: "helios-typeface";
+            src: url("{{ url_for('static', filename='fonts/Helios-Typeface.otf') }}");
+        }
+        @font-face {
+            font-family: "helios";
+            src: url("{{ url_for('static', filename='fonts/Helios-Light.ttf') }}");
+        }
+        .font-helios-typeface {
+            font-family: "helios-typeface" !important;
+        }
+        .font-helios {
+            font-family: "helios" !important;
+        }
+    </style>
 </head>
-<body data-bs-theme="light">
-    <nav class="navbar navbar-expand-lg bg-body-secondary">
+<body data-bs-theme="light" class="font-helios">
+    <nav class="navbar navbar-expand-lg bg-secondary-subtle border-bottom">
         <div class="px-4 d-flex w-100">
-            <a href="/" class="navbar-brand fs-2 d-flex align-items-center me-4 text-uppercase fst-italic font-monospace" id="brand">
-                <img src="{{ url_for('static', filename='images/spider.png') }}" alt="WebShot Logo" width="35px" class="me-2">
-                WebShot
+            <a href="/" class="navbar-brand d-flex align-items-center me-3" id="brand">
+                <img src="{{ url_for('static', filename='images/logo-title.png') }}" alt="Website Logo" height="35px" class="me-2">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                 <span class="navbar-toggler-icon"></span>
@@ -25,19 +40,63 @@
                     <li class="nav-item d-flex flex-grow-1">
                         <form class="d-flex flex-grow-1 mt-2 mt-lg-0 mb-3 mb-lg-0" role="search" id="searchForm">
                             <div class="input-group bg-body-tertiary rounded">
-                                <input type="search" class="form-control bg-transparent border-0" placeholder="https://example.com">
-                                <div class="bg-body-secondary">
+                                <div class="dropdown bg-secondary-subtle">
+                                    <button class="btn btn-body-tertiary rounded-end-0" type="button" id="browserBtn" data-bs-toggle="dropdown">
+                                        <i class="bi bi-browser-chrome" id="browserIcon"></i>
+                                    </button>
+                                    <div class="dropdown-menu shadow-sm bg-secondary-subtle py-0" style="min-width: fit-content">
+                                        <div class="btn-group-vertical" id="browsersButtons">
+                                            <button class="btn btn-body-tertiary" type="button" data-browser="chrome">
+                                                <i class="bi bi-browser-chrome d-block"></i>
+                                                Chrome
+                                            </button>
+                                            <button class="btn btn-body-tertiary" type="button"  data-browser="firefox">
+                                                <i class="bi bi-browser-firefox d-block"></i>
+                                                Firefox
+                                            </button>
+                                            <button class="btn btn-body-tertiary" type="button"  data-browser="edge">
+                                                <i class="bi bi-browser-edge d-block"></i>
+                                                Edge
+                                            </button>
+                                            <div class="w-100" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Not Supported Yet">
+                                                <button class="btn btn-body-tertiary w-100" type="button" disabled data-browser="safari">
+                                                    <i class="bi bi-browser-safari d-block"></i>
+                                                    Safari  
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="dropdown bg-secondary-subtle">
+                                    <button class="btn btn-body-tertiary rounded-0" type="button" id="protocolBtn" data-bs-toggle="dropdown">
+                                        <i class="bi bi-lock-fill" id="protocolIcon"></i>
+                                    </button>
+                                    <div class="dropdown-menu shadow-sm bg-secondary-subtle py-0" style="min-width: fit-content">
+                                        <div class="btn-group-vertical">
+                                            <button class="btn btn-body-tertiary" type="button">
+                                                <i class="bi bi-lock-fill d-block"></i>
+                                                HTTPS
+                                            </button>
+                                            <button class="btn btn-body-tertiary" type="button">
+                                                <i class="bi bi-unlock-fill d-block"></i>
+                                                HTTP
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="dropdown flex-fill">
+                                    <input type="search" class="form-control bg-transparent border-0 rounded-0" placeholder="example.com" autocomplete="on">
+                                </div>
+                                <div class="bg-secondary-subtle d-flex">
+                                    <button class="btn btn-body-tertiary rounded-0" type="button" id="historyBtn">
+                                        <i class="bi bi-clock-history"></i>
+                                    </button>
                                     <button class="btn btn-body-tertiary rounded-start-0" type="submit">
                                         <i class="bi bi-search"></i>
                                     </button>
                                 </div>
                             </div>
                         </form>
-                    </li>
-                    <li class="nav-item">
-                        <button class="btn btn-body-tertiary ms-0 ms-lg-3" type="button" id="browserBtn" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Browser">
-                            <i class="bi bi-browser-chrome"></i>
-                        </button>
                     </li>
                     <li class="nav-item">
                         <div class="ms-0 ms-lg-3" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Settings">
@@ -58,29 +117,32 @@
 
     <main class="pb-5">
         <div class="row g-0">
-            <div class="col-md-12">
-                <div class="px-4 py-3 bg-body-secondary d-flex font-monospace fw-semibold border-bottom border-top">
-                    <nav id="breadcrumbs">
-                        <ol class="breadcrumb mb-0">
-                        </ol>
-                    </nav>
-                    <span class="ms-auto" id="pagesProcessed">0 pages processed</span>
-                    <span class="mx-3">|</span>
-                    <span id="timer">0 seconds elapsed</span>
-                </div>
-            </div>
             <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-5 mb-4">
-                <div class="rounded-start-0 bg-body-secondary border-end border-bottom">
-                    <nav class="filetree py-3 overflow-x-auto">
+                <div class="rounded-start-0 bg-secondary-subtle border-end border-bottom">
+                    <div class="mb-3 px-3 pt-3 input-group d-flex">
+                        <button type="button" class="btn btn-body-tertiary me-auto rounded-end" id="collapseNew" data-bs-toggle="tooltip" data-bs-title="Collapse New">
+                            <i class="bi bi-list-nested"></i>
+                        </button>
+                        <button type="button" class="btn btn-body-tertiary rounded-start" id="expandAll" data-bs-toggle="tooltip" data-bs-title="Expand All">
+                            <i class="bi bi-chevron-double-down"></i>
+                        </button>
+                        <button type="button" class="btn btn-body-tertiary" id="collapseAll" data-bs-toggle="tooltip" data-bs-title="Collapse All">
+                            <i class="bi bi-chevron-double-up"></i>
+                        </button>
+                    </div>
+                    <nav class="filetree pb-3 d-block overflow-x-auto font-helios">
                         <ul class="filetree-container"></ul>
                     </nav>
                 </div>
             </div>
             <div class="col-xxl-10 col-xl-9 col-lg-8 col-md-7 mb-4">
-                <div class="row mt-4 px-4 font-monospace fw-semibold" id="outputRow">
+                <div class="row d-flex">
+                    <div class="col-md-12" id="tasksContainer"></div>
+                </div>
+                <div class="row mt-4 px-4" id="outputRow">
                     <!-- <div class="col-12 mb-4">
-                        <div class="bg-body-secondary p-4 d-inline-block">
-                            <img src="output/derventioeducation.com/1920x1080.png" style="height: 400px;" alt="">
+                        <div class="bg-secondary-subtle p-4 d-inline-block">
+                            <img src="" style="height: 400px;" alt="">
                         </div>
                     </div> -->
                 </div>
@@ -115,8 +177,11 @@
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
     <script>
-        const lightIconPath = "{{ url_for('static', filename='images/spider.png') }}";
-        const darkIconPath = "{{ url_for('static', filename='images/spider-white.png') }}";
+        // Logos
+        const logo = "{{ url_for('static', filename='images/logo-title.png') }}";
+        const logoAlt = "{{ url_for('static', filename='images/logo-title-alt.png') }}";
+        const logoSmall = "{{ url_for('static', filename='images/logo.png') }}";
+        const logoSmallAlt = "{{ url_for('static', filename='images/logo-alt.png') }}";
     </script>
     <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 </body>

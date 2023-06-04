@@ -1,13 +1,20 @@
 
 .btn-body-tertiary  {
     background-color: rgba(var(--bs-tertiary-bg-rgb),var(--bs-bg-opacity));
-    border-color: #f8f9fa;
     border: none;
 
 }
 
+.btn-body-tertiary.show  {
+    background-color: rgba(var(--bs-tertiary-bg-rgb),var(--bs-bg-opacity));
+}
+
 .btn-body-tertiary:hover {
     background-color: rgba(var(--bs-tertiary-bg-rgb), 60%);
+}
+
+.btn-body-tertiary:active {
+    background-color: rgba(var(--bs-tertiary-bg-rgb), 30%) !important;
 }
 
 .toggle-folder {

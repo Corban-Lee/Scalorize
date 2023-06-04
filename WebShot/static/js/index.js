@@ -23,31 +23,48 @@ $("#searchForm").submit(function(e) {
         return;
     }
 
+    const browser = localStorage.getItem("browser");
+
+    // create new task bar
+    $("#tasksContainer").append(`
+        <div class="px-3 py-2 bg-dark-subtle d-flex border-bottom" id="${browser}">
+            <span class="pagesProcessed me-3">
+                <span class="pagesProcessed-value">0</span>
+            </span>
+            <span>
+                <i class="bi bi-browser-${browser}"></i>
+            </span>
+            <nav class="breadcrumbs mx-3">
+                <ol class="breadcrumb mb-0">
+                </ol>
+            </nav>
+            <span class="timer ms-auto">
+                <span class="timer-value">0</span>
+            </span>
+        </div>
+    `);
+
     var pagesProcessed = 0;
-    var second = 0
+
+    var secondsElapsed = 0.0;
     var timerInterval = setInterval(() => {
-        second ++;
-        $("#timer").text(second + " seconds elapsed") 
-    }, 1000);
+        secondsElapsed += 0.1;
+        $(`#${browser} .timer > .timer-value`).text(secondsElapsed.toFixed(1));
+    }, 100);
 
-    var eventSource = new EventSource("/stream-screenshots?url=" + encodeURIComponent(url) + "&browser=" + localStorage.getItem("browser"));
+    var eventSource = new EventSource("/stream-screenshots?url=" + encodeURIComponent(url) + "&browser=" + browser);
     eventSource.onmessage = function(event) {
-        if (event.data === "DONE") { // move this to the error event handler with no DONE status message
-            clearInterval(timerInterval);
-            return;
-        }
-
-        pagesProcessed ++;
-        $("#pagesProcessed").text(`${pagesProcessed} pages processed`)
-
+        
         const data = JSON.parse(event.data);
         const screenshotPath = data.screenshotPath.replace(/\//g, '\\');
         const browserType = data.browser;
 
+        pagesProcessed ++;
+        $(`#${browserType} .pagesProcessed > .pagesProcessed-value`).text(pagesProcessed);
+
         createFileTreeItem(screenshotPath, browserType);
 
         const fileName = screenshotPath.split("\\").slice(-1)[0];
-        console.log(JSON.stringify(fileName))
         var [width, height] = fileName.replace(".png", "").split(/x(.*)/s);
 
         $("#outputRow").append(`
@@ -69,6 +86,8 @@ $("#searchForm").submit(function(e) {
     eventSource.onerror = function() {
         console.error("An error occured while trying to connect [eventsource]");
         eventSource.close();
+        $(`#${browser}`).removeClass("bg-dark-subtle").addClass("bg-primary-subtle")
+        clearInterval(timerInterval);
     }
 });
 
@@ -84,25 +103,6 @@ $("#themeBtn").on("click", function() {
     loadTheme(oppositeTheme);
 });
 
-$("#browserBtn").on("click", function() {
-    const currentBrowser = localStorage.getItem("browser");
-    const oppositeBrowser = currentBrowser == "chrome" ? "firefox" : "chrome";
-    localStorage.setItem("browser", oppositeBrowser);
-
-    setBrowser(oppositeBrowser);
-});
-
-function setBrowser(browser) {
-    const icon = $("#browserBtn").find("i.bi");
-
-    if (browser === "chrome") {
-        icon.removeClass("bi-browser-firefox").addClass("bi-browser-chrome");
-    }
-    else {
-        icon.removeClass("bi-browser-chrome").addClass("bi-browser-firefox");       
-    }
-}
-
 function loadTheme(theme) {
     localStorage.setItem("theme", theme);
 
@@ -111,13 +111,44 @@ function loadTheme(theme) {
 
     if (theme == "light") {
         icon.removeClass("bi-sun").addClass("bi-moon-stars");
-        $("#brand img").attr("src", lightIconPath);
+        $("#brand img").attr("src", logo);
     }
     else {
         icon.removeClass("bi-moon-stars").addClass("bi-sun");
-        $("#brand img").attr("src", darkIconPath);
+        $("#brand img").attr("src", logoAlt);
     }
 }
+
+// $("#browserBtn").on("click", function() {
+//     const currentBrowser = localStorage.getItem("browser");
+//     const oppositeBrowser = currentBrowser == "chrome" ? "firefox" : "chrome";
+//     localStorage.setItem("browser", oppositeBrowser);
+
+//     setBrowser(oppositeBrowser);
+// });
+$("#browsersButtons button").each(function() {
+    $(this).on("click", function() {
+        setBrowser($(this).data("browser"));
+    });
+});
+
+function setBrowser(browser) {
+    const icon = $("#browserBtn").find("i.bi");
+    icon.removeClass().addClass(`bi bi-browser-${browser}`);
+    localStorage.setItem("browser", browser);
+}
+
+$("#expandAll").on("click", function() {
+    $(".filetree-container.collapse").each(function() {
+        bootstrap.Collapse.getOrCreateInstance("#" + this.id).show();
+    });
+});
+
+$("#collapseAll").on("click", function() {
+    $(".filetree-container.collapse").each(function() {
+        bootstrap.Collapse.getOrCreateInstance("#" + this.id).hide();
+    });
+});
 
 function showFileTreeItem(item, parent) {
     if (item.type === "file") {
@@ -133,10 +164,16 @@ function showFileTreeItem(item, parent) {
             `).css("--indent", item.indent));
         }
     else if (item.type === "folder") {
+        if (item.show) {
+            var chevron = "down"
+        }
+        else {
+            var chevron = "right"
+        }
         parent.append($(`
             <li data-path="${item.path}">
                 <div class="filetree-item" data-bs-toggle="collapse" data-bs-target="#collapseFolder-${item.path}" role="button">
-                    <i class="bi bi-chevron-down filetree-item-name"></i>
+                    <i class="bi bi-chevron-${chevron} filetree-item-name"></i>
                     <i class="bi bi-slash-lg mx-2 text-body-emphasis"></i>
                     <span class="filetree-item-name">${item.name}</span>
                 </div>
@@ -149,12 +186,12 @@ function showFileTreeItem(item, parent) {
 function createFileTreeItem(data, browserType) {
     const parts = data.split("\\").filter((part) => part !== "").slice(1);
 
-    $("#breadcrumbs ol").html("");
+    $(`#${browserType} .breadcrumbs ol`).html("");
 
     for (var i = 0; i < parts.length; i++) {
         const part = parts[i]
 
-        $("#breadcrumbs ol").append(`<li class="breadcrumb-item">${part}</li>`);
+        $(`#${browserType} .breadcrumbs ol`).append(`<li class="breadcrumb-item">${part}</li>`);
 
         const type = i === parts.length - 1 ? "file" : "folder";
         var path = parts.slice(0, i + 1).join("/");
