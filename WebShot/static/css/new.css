@@ -1,0 +1,77 @@
+
+@font-face {
+    font-family: "Helios";
+    src: url("/static/fonts/Helios-Light.ttf");
+}
+
+body {
+    font-family: "Helios";
+    min-height: 100vh;
+}
+
+#root {
+    display: flex;
+    flex-wrap: nowrap;
+    align-content: start;
+    height: 100vh;
+    max-height: 100vh;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+#sidebar {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    width: 280px;
+}
+
+#filetree {
+    overflow: auto !important;
+}
+
+#filetree > ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: auto;
+    width: fit-content;
+}
+
+.filetree-item {
+}
+
+.filetree-item a, div {
+    color: var(--bs-body-color);
+    text-decoration: none;
+    display: flex;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.filetree-item ul {
+    list-style-type: none;
+}
+
+.no-text-highlight {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+}
+
+@media (max-width: 768px) {
+    #root {
+        flex-wrap: wrap;
+        flex-direction: row;
+    }
+
+    #sidebar {
+        width: 100%;
+        height: fit-content;
+    }
+}

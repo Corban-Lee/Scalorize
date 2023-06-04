@@ -7,7 +7,7 @@ index_blueprint = Blueprint("index", __name__)
 
 @index_blueprint.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("new.html")
 
 @index_blueprint.route("/stream-screenshots")
 def stream_screenshots():
