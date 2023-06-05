@@ -40,9 +40,9 @@ $("#searchForm").submit(function(event) {
         const screenshotPath = data.screenshotPath.replace(/\//g, '\\');
 
         $("#resultArea").append(`
-            <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6 mb-3">
+            <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
                 <a href="${screenshotPath}" target="_blank">
-                    <img src="${screenshotPath}" class="w-100 rounded">
+                    <img src="${screenshotPath}" class="w-100 rounded border">
                 </a>
             </div>
         `);
@@ -119,5 +119,34 @@ function showFiletreeItem(item, parent) {
 
             event.stopPropagation();
         });
+    }
+}
+
+$(document).ready(function() {
+    
+    const theme = localStorage.getItem("theme");
+    loadTheme(theme);
+});
+
+$("#themeBtn").on("click", function() {
+    const currentTheme = $(document.body).attr("data-bs-theme");
+    const oppositeTheme = currentTheme == "dark" ? "light" : "dark";
+
+    loadTheme(oppositeTheme);
+});
+
+function loadTheme(theme) {
+    localStorage.setItem("theme", theme);
+
+    const icon = $("#themeBtn").find("i.bi");
+    $(document.body).attr("data-bs-theme", theme);
+
+    if (theme == "light") {
+        icon.removeClass("bi-sun").addClass("bi-moon-stars");
+        $("#brand img").attr("src", logo);
+    }
+    else {
+        icon.removeClass("bi-moon-stars").addClass("bi-sun");
+        $("#brand img").attr("src", logoAlt);
     }
 }
