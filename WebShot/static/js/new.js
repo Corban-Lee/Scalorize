@@ -52,6 +52,7 @@ $("#searchForm").submit(function(event) {
 
     eventSource.onerror = () => {
         console.error("An error occured while trying to connect [eventsource]");
+        eventSource.close();
     }
 });
 
