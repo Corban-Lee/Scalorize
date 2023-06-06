@@ -2,6 +2,7 @@
 
 import re
 import time
+import logging
 from pathlib import Path
 from urllib.parse import urljoin, urlparse, ParseResult
 from typing import Generator
@@ -63,7 +64,7 @@ class Scraper:
             case "firefox":
                 options = webdriver.FirefoxOptions
                 driver = webdriver.Firefox
-                driver_path = "drivers/"
+                driver_path = "drivers/geckodriver-win64.exe"
 
             case "edge":
                 options = webdriver.EdgeOptions
@@ -76,7 +77,7 @@ class Scraper:
         options = options()
         options.add_argument("--headless")
 
-        return driver(driver_path, options=options)
+        return driver(executable_path=driver_path, options=options)
 
 
     def stream_screenshots_generator(self, url: str, browser="chrome") -> Generator[str, None, None]:
