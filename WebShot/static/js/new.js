@@ -35,19 +35,24 @@ $("#searchForm").submit(function(event) {
 
     var eventSource = new EventSource(eventSourceUrl);
 
+    // Show new task
+    // TODO:
+
     eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data)
-        const screenshotPath = data.screenshotPath.replace(/\//g, '\\');
+        const screenshotPath = data.screenshotPath;
 
-        $("#resultArea").append(`
-            <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
-                <a href="${screenshotPath}" target="_blank">
-                    <img src="${screenshotPath}" class="w-100 rounded border">
-                </a>
-            </div>
-        `);
+        addFiletreeItem(screenshotPath.replace(/\//g, '\\'));
 
-        addFiletreeItem(screenshotPath);
+        if ($(`#resultArea a[href="${screenshotPath}"]`).length === 0) {
+            $("#resultArea").append(`
+                <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6" data-item="${screenshotPath}">
+                    <a href="${screenshotPath}" target="_blank">
+                        <img src="${screenshotPath}" class="w-100 rounded border">
+                    </a>
+                </div>
+            `);
+        }
     }
 
     eventSource.onerror = () => {
@@ -89,14 +94,14 @@ function addFiletreeItem(screenshotPath) {
 function showFiletreeItem(item, parent) {
     if (item.type === "file") {
         const itemElement = $(`
-            <li class="filetree-item file">
+            <li data-path="${item.path}" class="filetree-item file">
                 <a href="output/${item.path}" target="_blank">
                     <i class="bi bi-browser-chrome me-1"></i>
                     <span>${item.name}</span>
                 </a>
             </li>
         `);
-        parent.prepend(itemElement);
+        parent.prepend(itemElement); // prepend so files appear before folders
     }
     else if (item.type === "folder") {
         const itemElement = $(`
