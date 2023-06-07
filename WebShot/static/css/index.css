@@ -1,53 +1,111 @@
 
-.btn-body-tertiary  {
-    background-color: rgba(var(--bs-tertiary-bg-rgb),var(--bs-bg-opacity));
-    border: none;
-
+@font-face {
+    font-family: "Helios";
+    src: url("/static/fonts/Helios-Light.ttf");
 }
 
-.btn-body-tertiary.show  {
-    background-color: rgba(var(--bs-tertiary-bg-rgb),var(--bs-bg-opacity));
+body {
+    font-family: "Helios";
+    min-height: 100vh;
+    max-height: 100vh;
 }
 
-.btn-body-tertiary:hover {
-    background-color: rgba(var(--bs-tertiary-bg-rgb), 60%);
-}
-
-.btn-body-tertiary:active {
-    background-color: rgba(var(--bs-tertiary-bg-rgb), 30%) !important;
-}
-
-.toggle-folder {
-    white-space: nowrap;
-}
-
-ul.filetree-container {
-    list-style: none;
-    padding-left: 0;
-    margin-bottom: 0;
-    min-width: fit-content;
-}
-
-li div.filetree-item {
+#root {
     display: flex;
-    align-items: center;
     flex-wrap: nowrap;
-    min-width: fit-content;
+    align-content: start;
+    height: 100vh;
+    max-height: 100vh;
+    overflow-x: auto;
+    overflow-y: auto;
+}
 
-    /* border-radius: var(--bs-border-radius); */
-    padding: 0.2rem 0.5rem;
-    padding-left: var(--indent);
+#sidebar {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    width: 280px;
+}
 
+#filetree {
+    overflow: auto !important;
+}
+
+#filetree > ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: auto;
+    width: fit-content;
+}
+
+/* .filetree-item {
+} */
+
+.filetree-item a, .filetree-item div {
+    color: var(--bs-body-color);
+    text-decoration: none;
+    display: flex;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.filetree-item a i.bi, .filetree-item div i.bi {
+    transition: transform 0.3s ease;
+}
+
+.filetree-item ul {
+    list-style-type: none;
+}
+
+.no-text-highlight {
     -webkit-user-select: none; /* Safari */
     -ms-user-select: none; /* IE 10 and IE 11 */
     user-select: none; /* Standard syntax */
 }
 
-li div.filetree-item .filetree-item-name {
-    color: var(--bs-secondary-color);
+@media (max-width: 768px) {
+    #root {
+        flex-wrap: wrap;
+        flex-direction: row;
+    }
+
+    #sidebar {
+        width: 100%;
+        height: fit-content;
+    }
 }
 
-li div.filetree-item:hover .filetree-item-name {
-    /* background-color: rgb(var(--bs-tertiary-bg-rgb)); */
-    color: var(--bs-emphasis-color);
+.btn-modal {
+    background-color: var(--bs-secondary-bg) !important;
+}
+
+.btn-sidebar {
+    background-color: var(--bs-body-bg) !important;
+}
+
+.btn-sidebar:disabled {
+    background-color: var(--bs-secondary-bg) !important;
+    opacity: inherit !important;
+}
+
+.sidebar-container {
+    background-color: var(--bs-body-bg) !important;
+}
+
+.sidebar-container.disabled {
+    background-color: var(--bs-secondary-bg) !important;
+}
+
+#resultArea {
+    /* display: grid;
+    grid-gap: 15px;
+    grid-template-columns: repeat(auto-fit, 200px);
+    grid-auto-rows: auto;
+    grid-auto-flow: dense; */
 }
