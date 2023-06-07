@@ -10,6 +10,7 @@ from urllib.parse import urljoin, urlparse, ParseResult
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import WebDriverException
 
 
 class Scraper:
