@@ -99,7 +99,7 @@ $("#searchForm").submit(function(event) {
         const screenshotPath = data.screenshotPath;
         const imageData = data.imageData;
 
-        addFiletreeItem(screenshotPath.replace(/\//g, '\\'), browser);
+        addFiletreeItem(screenshotPath.replace(/\//g, '\\'), browser, imageData);
 
         if ($(`#resultArea a[href="${screenshotPath}"]`).length === 0) {
             // col-xxl-2 col-xl-3 col-lg-4 col-sm-6
@@ -130,7 +130,7 @@ $("#searchForm").submit(function(event) {
     }
 });
 
-function addFiletreeItem(screenshotPath, browser) {
+function addFiletreeItem(screenshotPath, browser, imageData) {
     const pathParts = screenshotPath.split("\\").filter((part) => part !== "").splice(1);
 
     $("#taskToast .breadcrumb").html("");
@@ -155,6 +155,7 @@ function addFiletreeItem(screenshotPath, browser) {
             safePath: safePath,
             children: [],
             show: i === 0 ? "show" : "",
+            imageData: type === "file" ? imageData : null
         }
 
         $("#taskToast .breadcrumb").append(`<li class="breadcrumb-item">${part}</li>`);
@@ -168,7 +169,7 @@ function showFiletreeItem(item, parent, browser) {
     if (item.type === "file") {
         const itemElement = $(`
             <li data-path="${item.path}" class="filetree-item file">
-                <a href="output/${item.path}" target="_blank">
+                <a href="data:image/png;base64,${item.imageData}" target="_blank">
                     <i class="bi bi-browser-${browser} me-1"></i>
                     <span>${item.name}</span>
                 </a>
