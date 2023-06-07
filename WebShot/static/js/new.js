@@ -8,43 +8,80 @@ function generateUniqueId() {
     return `${timestamp}-${random}`;
 }
 
-// COLLAPSE CHEVRON
-// $(document).ready(function() {
-//     $(".folder > div").on("click", function() {
-//         $(this).find(".bi").css("transform", "rotate(90deg)")
-//     });
-// });
-
+/**
+ * Tests the validity of a given URL.
+ * @param {string} url - The URL to validate.
+ * @returns {boolean} - True if the URL is valid
+ */
 function validUrl(url) {
     const urlPattern = /^(https?:\/\/)?([\w.]+)\.([a-z]{2,6}\.?)(\/[\w.]*)*\/?$/i;
     return urlPattern.test(url);
 }
 
+$(document).ready(function() {
+
+    // Load the stored or default driver
+    var storedDriver = localStorage.getItem('driver');
+    storedDriver = !storedDriver ? "chrome" : storedDriver;
+    $(`input[name='drivers'][value='${storedDriver}']`).prop('checked', true);
+
+    // Store the selected driver
+    $("input[name='drivers']").on("click", function() {
+        localStorage.setItem("driver", $(this).val());
+    });
+});
+
+
 $("#searchForm").submit(function(event) {
     event.preventDefault();
 
-    const address = $(this).find("input[type=search]").val();
+    const address = $(this).find("#search").val();
 
     if (!validUrl(address)) {
         alert("Please enter a valid web address");
         return;
     }
 
+    const browser = $("input[name='drivers']:checked").val();
+
+    if (!browser) {
+        alert("Please select a driver from the drivers dropdown");
+        return;
+    }
+    
     const encodedAddress = encodeURIComponent(address);
-    const eventSourceUrl = `/stream-screenshots?url=${encodedAddress}&browser=chrome`;
+    const eventSourceUrl = `/stream-screenshots?url=${encodedAddress}&browser=${browser}`;
 
     var eventSource = new EventSource(eventSourceUrl);
 
+    // Disable UI
+    $("#search").prop("disabled", true);
+    $("#searchBtn").prop("disabled", true);
+    $("input[name='drivers']").prop("disabled", true);
+    $("#btnDrivers").prop("disabled", true);
+    $("#collapseDrivers").removeClass("show");
+
     // Show new task
-    // TODO:
+    $("#taskToast .timer").text("0.0");
+    $("#taskToast .breadcrumb").html("");
+    $("#taskToast .task-domain").text(address.split("://")[1]);
+    $("#taskToast .browser-icon").removeClass().addClass(`browser-icon bi bi-browser-${browser}`);
+    $("#taskToast").addClass("show");
+
+    var timer = 0.0
+    var timerInterval = setInterval(() => {
+        timer += 0.1;
+        $("#taskToast .timer").text(timer.toFixed(1));
+    }, 100);
 
     eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data)
         const screenshotPath = data.screenshotPath;
 
-        addFiletreeItem(screenshotPath.replace(/\//g, '\\'));
+        addFiletreeItem(screenshotPath.replace(/\//g, '\\'), browser);
 
         if ($(`#resultArea a[href="${screenshotPath}"]`).length === 0) {
+            // col-xxl-2 col-xl-3 col-lg-4 col-sm-6
             $("#resultArea").append(`
                 <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6" data-item="${screenshotPath}">
                     <a href="${screenshotPath}" target="_blank">
@@ -58,11 +95,23 @@ $("#searchForm").submit(function(event) {
     eventSource.onerror = () => {
         console.error("An error occured while trying to connect [eventsource]");
         eventSource.close();
+
+        // Enable UI
+        $("#search").prop("disabled", false);
+        $("#searchBtn").prop("disabled", false);
+        $("input[name='drivers']").prop("disabled", false);
+        $("#btnDrivers").prop("disabled", false);
+
+        // Hide task
+        $("#taskToast").removeClass("show");
+        clearInterval(timerInterval);
     }
 });
 
-function addFiletreeItem(screenshotPath) {
+function addFiletreeItem(screenshotPath, browser) {
     const pathParts = screenshotPath.split("\\").filter((part) => part !== "").splice(1);
+
+    $("#taskToast .breadcrumb").html("");
 
     for (var i = 0; i < pathParts.length; i++) {
         const path = pathParts.slice(0, i + 1).join("/");
@@ -86,17 +135,19 @@ function addFiletreeItem(screenshotPath) {
             show: i === 0 ? "show" : "",
         }
 
+        $("#taskToast .breadcrumb").append(`<li class="breadcrumb-item">${part}</li>`);
+
         var parent = $(`li[data-path="${safeParentPath}"]`).length > 0 ? $(`#collapse-${safeParentPath}`) : $("#filetree > ul").first();
-        showFiletreeItem(item, parent)
+        showFiletreeItem(item, parent, browser)
     }
 }
 
-function showFiletreeItem(item, parent) {
+function showFiletreeItem(item, parent, browser) {
     if (item.type === "file") {
         const itemElement = $(`
             <li data-path="${item.path}" class="filetree-item file">
                 <a href="output/${item.path}" target="_blank">
-                    <i class="bi bi-browser-chrome me-1"></i>
+                    <i class="bi bi-browser-${browser} me-1"></i>
                     <span>${item.name}</span>
                 </a>
             </li>

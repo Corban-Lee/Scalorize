@@ -79,7 +79,7 @@ class Scraper:
         return driver(driver_path, options=options)
 
 
-    def stream_screenshots_generator(self, url: str, browser="chrome") -> Generator[str, None, None]:
+    def stream_screenshots_generator(self, url: str, browser = "chrome") -> Generator[str, None, None]:
         """
         Streams a generator of screenshots from the given url.
 
@@ -104,15 +104,13 @@ class Scraper:
 
         while not self.url_queue.empty():
             url = self.url_queue.get()
-            screenshots = self.process_url(driver, url, browser)
+            screenshots = self.process_url(driver, url)
             for screenshot in screenshots:
+                print("screenshot")
                 if screenshot:
-                    yield f'data: {{"screenshotPath": "{str(screenshot)}", "browser": "{browser}"}}\n\n'.replace("\\", "/")
+                    yield f'data: {{"screenshotPath": "{str(screenshot)}"}}\n\n'.replace("\\", "/")
 
-
-        yield f"data: DONE\n\n"
-
-    def process_url(self, driver, url: str, browser: str):
+    def process_url(self, driver, url: str):
         """
 
         Yields
@@ -136,7 +134,7 @@ class Scraper:
         start = time.time()
 
         # capture screenshot of the current page    
-        for capture in self.capture(driver, browser):
+        for capture in self.capture(driver):
             yield capture
 
         print(f"Screenshots taken in {time.time() - start:.2f} seconds.")
@@ -198,7 +196,7 @@ class Scraper:
 
         return screeshot_folder
 
-    def capture(self, driver, browser: str) -> str:
+    def capture(self, driver) -> str:
         """
         Captures a screenshot and saves it to disk.
 
@@ -217,10 +215,14 @@ class Scraper:
             screenshot_folder = self.create_screenshot_folder(driver, output_path, safe_characters)
 
             for resolution in self.resolutions:
+
+                # Get a full screen screenshot
                 width, height = map(int, resolution.split("x"))
                 driver.set_window_size(width, height)
+                total_height = driver.execute_script('return document.body.parentNode.scrollHeight')
+                driver.set_window_size(width, total_height)
 
-                filename = screenshot_folder / f"{resolution} {browser.title()}.png"
+                filename = screenshot_folder / f"{width} {driver.capabilities['browserName']}.png"
                 driver.save_screenshot(filename)
                 yield filename
 

@@ -80,3 +80,28 @@ body {
         height: fit-content;
     }
 }
+
+.btn-sidebar {
+    background-color: var(--bs-body-bg) !important;
+}
+
+.btn-sidebar:disabled {
+    background-color: var(--bs-secondary-bg) !important;
+    opacity: inherit !important;
+}
+
+.sidebar-container {
+    background-color: var(--bs-body-bg) !important;
+}
+
+.sidebar-container.disabled {
+    background-color: var(--bs-secondary-bg) !important;
+}
+
+#resultArea {
+    /* display: grid;
+    grid-gap: 15px;
+    grid-template-columns: repeat(auto-fit, 200px);
+    grid-auto-rows: auto;
+    grid-auto-flow: dense; */
+}

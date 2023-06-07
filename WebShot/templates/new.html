@@ -21,45 +21,24 @@
 
             <hr>
 
-            <!-- File search -->
-            <!-- <div class="input-group input-group-sm mb-3">
-                <input type="search" name="iletree" id="searchFiletree" class="form-control" placeholder="Search Results">
-                <button type="button" class="btn btn-secondary">
-                    <i class="bi bi-search"></i>
-                </button>
-            </div> -->
-
-            <!-- Filetree controls -->
-            <!-- <div class="btn-group btn-group-sm mb-3 d-block">
-                <button class="btn btn-outline-secondary float-start">
-                    <i class="bi bi-chevron-up"></i>
-                </button>
-                <button class="btn btn-outline-secondary rounded-end-1 float-start">
-                    <i class="bi bi-chevron-down"></i>
-                </button>
-                <button class="btn btn-outline-secondary rounded-start-1 float-end">
-                    <i class="bi bi-list"></i>
-                </button>
-            </div> -->
-
             <form id="searchForm">
                 <div class="input-group mb-3">
                     <input class="form-control" type="search" name="search" id="search" placeholder="https://example.com">
-                    <button type="submit" class="btn bg-body border border-start-0 rounded-start-0">
+                    <button type="submit" class="btn btn-sidebar border border-start-0 rounded-start-0" id="searchBtn">
                         <i class="bi bi-search"></i>
                     </button>
                 </div>
                 <div class="d-flex flex-wrap justify-content-md-between justify-content-start align-items-center">
                     <div class="d-flex">
-                        <button type="button" class="btn bg-body border dropdown-toggle me-2 mb-3" data-bs-toggle="collapse" data-bs-target="#collapseDrivers">
+                        <button type="button" id="btnDrivers" class="btn btn-sidebar border dropdown-toggle me-2 mb-3" data-bs-toggle="collapse" data-bs-target="#collapseDrivers">
                             Drivers
                         </button>
                     </div>
                     <div class="d-flex">
-                        <button type="button" class="btn bg-body border me-2 mb-3">
+                        <button type="button" class="btn btn-sidebar border me-2 mb-3">
                             <i class="bi bi-gear"></i>
                         </button>
-                        <button type="button" class="btn bg-body border mb-3" id="themeBtn">
+                        <button type="button" class="btn btn-sidebar border mb-3" id="themeBtn">
                             <i class="bi bi-moon-stars"></i>
                         </button>
                     </div>
@@ -67,23 +46,23 @@
             </form>
 
             <div class="collapse mb-3" id="collapseDrivers">
-                <div class="bg-body border w-100 p-3 rounded">
+                <div class="sidebar-container border w-100 p-3 rounded" id="driversOptions">
                     <div class="form-check">
-                        <input type="checkbox" name="drivers" id="chromeDriver" class="me-3 form-check-input">
+                        <input type="radio" name="drivers" id="chromeDriver" value="chrome" class="me-3 form-check-input">
                         <label for="chromeDriver" class="form-check-label">
                             <i class="bi bi-browser-chrome me-1"></i>
                             Chrome
                         </label>
                     </div>
                     <div class="form-check">
-                        <input type="checkbox" name="drivers" id="firefoxDriver" class="me-3 form-check-input">
+                        <input type="radio" name="drivers" id="firefoxDriver" value="firefox" class="me-3 form-check-input">
                         <label for="firefoxDriver" class="form-check-label">
                             <i class="bi bi-browser-firefox me-1"></i>
                             Firefox
                         </label>
                     </div>
                     <div class="form-check">
-                        <input type="checkbox" name="drivers" id="edgeDriver" class="me-3 form-check-input">
+                        <input type="radio" name="drivers" id="edgeDriver" value="edge" class="me-3 form-check-input">
                         <label for="edgeDriver" class="form-check-label">
                             <i class="bi bi-browser-edge me-1"></i>
                             Edge
@@ -98,6 +77,7 @@
             </div>
         </div>
 
+        <!-- Image Results Area -->
         <div class="d-flex flex-grow-1 flex-column overflow-y-auto">
             <div class="p-3">
                 <div class="row g-3" id="resultArea"></div>
@@ -106,25 +86,23 @@
 
         <!-- toast container -->
         <div class="toast-container position-fixed bottom-0 end-0 p-3">
-            <div class="toast show">
-                <div class="toast-header pe-1">
-                    <i class="bi bi-browser-chrome me-2"></i>
-                    <strong class="me-auto"></strong>
-                    <small>12.4</small>
-                    <button type="button" class="btn btn-sm ms-1" data-bs-dismiss="toast">
+            <div class="toast" id="taskToast">
+                <div class="toast-header">
+                    <i class="browser-icon"></i>
+                    <strong class="ms-2 me-auto task-domain"></strong>
+                    <span class="timer"></span>
+                    <!-- <button type="button" class="btn btn-sm ms-1" data-bs-dismiss="toast">
                         <i class="bi bi-trash3"></i>
-                    </button>
+                    </button> -->
                 </div>
                 <div class="toast-body">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item">https://derventioeducation.com</li>
-                        <li class="breadcrumb-item">case-studies</li>
-                        <li class="breadcrumb-item">international</li>
-                        <li class="breadcrumb-item">a-client-study</li>
-                        <li class="breadcrumb-item">1920x1080 chrome.png</li>
-                    </ol>
+                    <ol class="breadcrumb mb-0"></ol>
                 </div>
             </div>
+        </div>
+
+        <div class="modal d-none">
+
         </div>
 
     </div>
