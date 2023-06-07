@@ -3,6 +3,7 @@
 import re
 import time
 import logging
+import requests
 from pathlib import Path
 from urllib.parse import urljoin, urlparse, ParseResult
 from typing import Generator
@@ -53,6 +54,19 @@ class Scraper:
         self.url_queue = MPQueue()
 
     def get_driver(self, browser: str):
+        """
+        Creates and returns a driver for the given browser name.
+
+        Parameters
+        ----------
+        browser : str
+            The name of the browser to be used. Can be `chrome`, `firefox` or `edge`.
+
+        Returns
+        -------
+        webdriver : selenium.webdriver.WebDriver
+            A configued driver for the given browser.
+        """
 
         match browser:
 
@@ -88,63 +102,65 @@ class Scraper:
         ----------
         url : str
             The initial URL to visit, all scraping will start from this URL.
+        browser : str, optional
+            The name of the browser to be used. If not provided defaults to `chrome`.
 
-        Returns
+        Yields
         -------
-        screenshot_generator : generator
-            A generator of relative screenshot filepaths from the given url.
+        data : str
+            A serialized json dictionary containing the screenshot filepath as a string.
         """
 
         self.initial_url = urlparse(url)
         self.url_queue.put(url)
-
-        # A clean slate is required to avoid conflicts with previous streams
-        self.visited_urls.clear()
-
         driver = self.get_driver(browser)
 
         while not self.url_queue.empty():
             url = self.url_queue.get()
             screenshots = self.process_url(driver, url)
             for screenshot in screenshots:
-                print("screenshot")
                 if screenshot:
                     yield f'data: {{"screenshotPath": "{str(screenshot)}"}}\n\n'.replace("\\", "/")
 
+    @staticmethod
+    def is_redirect(url):
+        response = requests.head(url, allow_redirects=True)
+        return response.is_redirect
+
     def process_url(self, driver, url: str):
         """
+        Process a url through the scraper
+        
+        Parameters
+        ----------
+        url : str
+            The URL to process.
+
+        Returns
+        -------
+        NoneType
+            The passed URL is not of the initial domain, is a visitied URL or is a redirect. 
 
         Yields
         ------
-        screenshot_paths : list of Path objects
-            A relative path of the most recently taken screenshot.
+        capture_generator : Generator object
+            Generates a screenshot of the passed URL at each resolution.
         """
 
-        if url in self.visited_urls:
+        if urlparse(url).netloc != self.initial_url.netloc or url in self.visited_urls or self.is_redirect(url):
             return
 
-        # load the current page
         driver.get(url)
-
-        # Check after going to the page to catch redirects
-        if urlparse(driver.current_url).netloc != self.initial_url.netloc or driver.current_url in self.visited_urls:
-            return
 
         self.visited_urls.add(url)
 
-        start = time.time()
-
-        # capture screenshot of the current page    
+        # Capture screenshot of the current page at each resolution 
         for capture in self.capture(driver):
             yield capture
 
-        print(f"Screenshots taken in {time.time() - start:.2f} seconds.")
-
-        start = time.time()
-
+        # Scrape all URLs from the current page and add valid URLS to the queue
         self.scrape_urls_to_queue(driver, url)
 
-        print(f"Urls scraped in {time.time() - start:.2f} seconds.")
 
     def scrape_urls_to_queue(self, driver, url: str) -> None:
         """
@@ -224,7 +240,7 @@ class Scraper:
                 driver.set_window_size(width, total_height)
 
                 filename = screenshot_folder / f"{width} {driver.capabilities['browserName']}.png"
-                driver.save_screenshot(filename)
+                # driver.save_screenshot(filename)
                 yield filename
 
         except WebDriverException as error:
