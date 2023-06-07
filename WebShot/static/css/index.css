@@ -89,6 +89,11 @@ body {
     background-color: var(--bs-body-bg) !important;
 }
 
+.btn-sidebar.dropdown-toggle:not(.collapsed) {
+    color: var(--bs-emphasis-color) !important;
+    background-color: var(--bs-tertiary-bg) !important;
+}
+
 .btn-sidebar:disabled {
     background-color: var(--bs-secondary-bg) !important;
     opacity: inherit !important;

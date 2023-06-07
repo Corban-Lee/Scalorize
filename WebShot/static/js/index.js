@@ -48,9 +48,23 @@ $("#searchForm").submit(function(event) {
         alert("Please select a driver from the drivers dropdown");
         return;
     }
-    
+
+    var resolutions = $("input[name='resolutions']:checked").map(function() { return $(this).val(); }).get();
+
+    if (!resolutions.length) {
+        alert("Please select a resolution from the captures dropdown");
+        return;
+    }
+
     const encodedAddress = encodeURIComponent(address);
-    const eventSourceUrl = `/stream-screenshots?url=${encodedAddress}&browser=${browser}`;
+    var eventSourceUrl = `/stream-screenshots?url=${encodedAddress}&browser=${browser}`;
+
+    resolutions.forEach((resolution) => {
+        eventSourceUrl += `&resolution=${resolution}`;
+    });
+
+    const fullScreenshot = $("#option-fullScreenshot").prop("checked");
+    eventSourceUrl += `&fullscreen=${fullScreenshot}`;
 
     var eventSource = new EventSource(eventSourceUrl);
 
@@ -62,8 +76,10 @@ $("#searchForm").submit(function(event) {
     $("#search").prop("disabled", true);
     $("#searchBtn").prop("disabled", true);
     $("input[name='drivers']").prop("disabled", true);
+
+    $("#sidebar .dropdown-toggle:not(.collapsed)").click();
     $("#btnDrivers").prop("disabled", true);
-    $("#collapseDrivers").removeClass("show");
+    $("#btnResolutions").prop("disabled", true);
 
     // Show new task
     $("#taskToast .timer").text("0.0");
@@ -106,6 +122,7 @@ $("#searchForm").submit(function(event) {
         $("#searchBtn").prop("disabled", false);
         $("input[name='drivers']").prop("disabled", false);
         $("#btnDrivers").prop("disabled", false);
+        $("#btnResolutions").prop("disabled", false);
 
         // Hide task
         $("#taskToast").removeClass("show");

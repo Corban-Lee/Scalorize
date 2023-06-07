@@ -38,13 +38,15 @@ class Scraper:
         Creates and returns an absolute URL from the given base and relative URLs.
     """
 
-    def __init__(self, resolutions: tuple[str] = ("360x640",)):
+    def __init__(self, resolutions: tuple[str], fullscreen: bool):
         driver_path = "drivers/chrome-win32.exe"
         options = Options()
         options.add_argument("--headless")
         self.driver = lambda: webdriver.Chrome(driver_path, options=options)
 
         self.resolutions = resolutions
+        self.fullscreen = fullscreen
+
         self.initial_url: ParseResult = None
         self.visited_urls = set()
         self.url_queue = MPQueue()
@@ -234,11 +236,13 @@ class Scraper:
                 width, height = map(int, resolution.split("x"))
                 driver.set_window_size(width, height)
 
-                if False:  # TODO: This will be for the full screenshot setting
+                filename = screenshot_folder / f"{resolution} {driver.capabilities['browserName']}.png"
+
+                if self.fullscreen:
                     total_height = driver.execute_script('return document.body.parentNode.scrollHeight')
                     driver.set_window_size(width, total_height)
+                    filename = str(filename).replace(f"x{height}", "")
 
-                filename = screenshot_folder / f"{width} {driver.capabilities['browserName']}.png"
                 image_data = driver.get_screenshot_as_base64()
                 yield (image_data, filename)
 

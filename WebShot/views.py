@@ -12,8 +12,14 @@ def index():
 @index_blueprint.route("/stream-screenshots")
 def stream_screenshots():
     url = request.args.get("url")
-    browsers = request.args.get("browser")
-    response = make_response(Response(Scraper().stream_screenshots_generator(url, browsers), mimetype="text/event-stream"))
+    browser = request.args.get("browser")
+    resolutions = request.args.getlist("resolution")
+    fullscreen = request.args.get("fullscreen") == "true"
+
+    scraper = Scraper(resolutions, fullscreen)
+    capture_generator = lambda: scraper.stream_screenshots_generator(url, browser)
+
+    response = make_response(Response(capture_generator(), mimetype="text/event-stream"))
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
