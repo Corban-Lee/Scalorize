@@ -202,7 +202,7 @@ function loadTheme(theme) {
         icon.removeClass("bi-sun").addClass("bi-moon-stars");
         $("#brand img").attr("src", logo);
     }
-    else {
+    else if (theme == "dark") {
         icon.removeClass("bi-moon-stars").addClass("bi-sun");
         $("#brand img").attr("src", logoAlt);
     }
