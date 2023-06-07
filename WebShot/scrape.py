@@ -38,7 +38,7 @@ class Scraper:
         Creates and returns an absolute URL from the given base and relative URLs.
     """
 
-    def __init__(self, resolutions: tuple[str] = ("1920x1080",)):
+    def __init__(self, resolutions: tuple[str] = ("360x640",)):
         driver_path = "drivers/chrome-win32.exe"
         options = Options()
         options.add_argument("--headless")
@@ -113,10 +113,9 @@ class Scraper:
 
         while not self.url_queue.empty():
             url = self.url_queue.get()
-            screenshots = self.process_url(driver, url)
-            for screenshot in screenshots:
-                if screenshot:
-                    yield f'data: {{"screenshotPath": "{str(screenshot)}"}}\n\n'.replace("\\", "/")
+
+            for image_data, screenshot_filepath in self.process_url(driver, url):
+                yield f'data: {{"screenshotPath": "{str(screenshot_filepath)}", "imageData": "{str(image_data)}"}}\n\n'.replace("\\", "/")
 
     @staticmethod
     def is_redirect(url):
@@ -147,8 +146,9 @@ class Scraper:
             return
 
         driver.get(url)
-
         self.visited_urls.add(url)
+
+        # if driver.current_url != url: redirect slipped through
 
         # Capture screenshot of the current page at each resolution 
         for capture in self.capture(driver):
@@ -174,15 +174,17 @@ class Scraper:
         def clean_url(url: str) -> str:
             return url.removesuffix("#").removesuffix("/")
 
-        hrefs = [anchor_tag.get_attribute("href") for anchor_tag in self.get_anchor_tags(driver)]
-
-        for href in hrefs:
-            if not href:
-                continue
-
+        for href in self.generate_hrefs(driver):
             absolute_url = self.construct_absolute_url(url, clean_url(href))
             if is_initial_domain(href) and absolute_url not in self.visited_urls:
                 self.url_queue.put(absolute_url)
+
+    @staticmethod
+    def generate_hrefs(driver):
+        for anchor_tag in driver.find_elements(By.TAG_NAME, "a"):
+            href = anchor_tag.get_attribute("href")
+            if href:
+                yield href
 
     def create_screenshot_folder(self, driver, relative_path: Path, safe_characters: tuple[str]) -> Path:
         """
@@ -205,7 +207,7 @@ class Scraper:
         screenshot_safe_path = re.sub(r"[^a-zA-Z0-9%s]+" % re.escape(safe_characters), "", parsed_url.path).lstrip("/")
 
         screeshot_folder = Path(relative_path, parsed_url.netloc, screenshot_safe_path)
-        screeshot_folder.mkdir(parents=True, exist_ok=True)
+        # screeshot_folder.mkdir(parents=True, exist_ok=True)
 
         return screeshot_folder
 
@@ -222,43 +224,26 @@ class Scraper:
         try:
             # The output path contains all output files
             output_path = Path("output/")
-            output_path.mkdir(exist_ok=True)
+            # output_path.mkdir(exist_ok=True)
 
-            safe_characters = " ._/-"
-            screenshot_folder = self.create_screenshot_folder(driver, output_path, safe_characters)
+            screenshot_folder = self.create_screenshot_folder(driver, output_path, " ._/-")
 
             for resolution in self.resolutions:
 
                 # Get a full screen screenshot
                 width, height = map(int, resolution.split("x"))
                 driver.set_window_size(width, height)
-                total_height = driver.execute_script('return document.body.parentNode.scrollHeight')
-                driver.set_window_size(width, total_height)
+
+                if False:  # TODO: This will be for the full screenshot setting
+                    total_height = driver.execute_script('return document.body.parentNode.scrollHeight')
+                    driver.set_window_size(width, total_height)
 
                 filename = screenshot_folder / f"{width} {driver.capabilities['browserName']}.png"
-                # driver.save_screenshot(filename)
-                yield filename
+                image_data = driver.get_screenshot_as_base64()
+                yield (image_data, filename)
 
         except WebDriverException as error:
             print(f"Error capturing screenshots: {error}")
-
-    def get_anchor_tags(self, driver) -> list:
-        """
-        Returns a list of `WebElements` representing all anchor tags found on the current web page.
-
-        Parameters
-        ----------
-        url : str
-            The url of the webpage that anchor tags will be scraped from.
-
-        Returns
-        -------
-        anchor_tags : list
-            A list of `WebElements` representing anchor tags.
-        """
-
-        anchor_tags = driver.find_elements(By.TAG_NAME, "a")
-        return anchor_tags
 
     @staticmethod
     def construct_absolute_url(base_url, relative_url):

@@ -54,6 +54,10 @@ $("#searchForm").submit(function(event) {
 
     var eventSource = new EventSource(eventSourceUrl);
 
+    $(window).off("beforeunload").on("beforeunload", function() {
+        return "Are you sure you want to leave this page? Your progress will be lost.";
+    });
+
     // Disable UI
     $("#search").prop("disabled", true);
     $("#searchBtn").prop("disabled", true);
@@ -77,6 +81,7 @@ $("#searchForm").submit(function(event) {
     eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data)
         const screenshotPath = data.screenshotPath;
+        const imageData = data.imageData;
 
         addFiletreeItem(screenshotPath.replace(/\//g, '\\'), browser);
 
@@ -84,8 +89,8 @@ $("#searchForm").submit(function(event) {
             // col-xxl-2 col-xl-3 col-lg-4 col-sm-6
             $("#resultArea").append(`
                 <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6" data-item="${screenshotPath}">
-                    <a href="${screenshotPath}" target="_blank">
-                        <img src="${screenshotPath}" class="w-100 rounded border">
+                    <a href="data:image/png;base64,${imageData}" target="_blank">
+                        <img src="data:image/png;base64,${imageData}" class="w-100 rounded border shadow-sm">
                     </a>
                 </div>
             `);
