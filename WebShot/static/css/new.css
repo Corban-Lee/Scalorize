@@ -81,6 +81,10 @@ body {
     }
 }
 
+.btn-modal {
+    background-color: var(--bs-secondary-bg) !important;
+}
+
 .btn-sidebar {
     background-color: var(--bs-body-bg) !important;
 }

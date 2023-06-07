@@ -185,30 +185,23 @@ function showFiletreeItem(item, parent, browser) {
 }
 
 $(document).ready(function() {
-    
-    const theme = localStorage.getItem("theme");
-    loadTheme(theme);
+    var useDarkMode = localStorage.getItem("option-useDarkMode");
+    setDarkMode(useDarkMode === "true");
 });
 
-$("#themeBtn").on("click", function() {
-    const currentTheme = $(document.body).attr("data-bs-theme");
-    const oppositeTheme = currentTheme == "dark" ? "light" : "dark";
-
-    loadTheme(oppositeTheme);
+$("#option-useDarkMode").on("click", function() {
+    const enable = $(this).prop("checked");
+    localStorage.setItem("option-useDarkMode", enable);
+    setDarkMode(enable);
 });
 
-function loadTheme(theme) {
-    localStorage.setItem("theme", theme);
+function setDarkMode(enable) {
+    $("#option-useDarkMode").prop("checked", enable);
 
-    const icon = $("#themeBtn").find("i.bi");
+    const theme = enable ? "dark" : "light"
     $(document.body).attr("data-bs-theme", theme);
 
-    if (theme == "light") {
-        icon.removeClass("bi-sun").addClass("bi-moon-stars");
-        $("#brand img").attr("src", logo);
-    }
-    else if (theme == "dark") {
-        icon.removeClass("bi-moon-stars").addClass("bi-sun");
-        $("#brand img").attr("src", logoAlt);
-    }
+    // Update the logo to match the theme
+    const sidebarLogo = !enable ? logo : logoAlt;
+    $("#brand img").attr("src", sidebarLogo);
 }

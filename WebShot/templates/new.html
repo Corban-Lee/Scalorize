@@ -38,7 +38,7 @@
                         <button type="button" class="btn btn-sidebar border me-2 mb-3" data-bs-toggle="modal" data-bs-target="#optionsModal">
                             <i class="bi bi-gear"></i>
                         </button>
-                        <button type="button" class="btn btn-sidebar border mb-3" id="themeBtn">
+                        <button type="button" class="btn btn-sidebar border mb-3">
                             <i class="bi bi-moon-stars"></i>
                         </button>
                     </div>
@@ -104,13 +104,13 @@
         <div class="modal fade" id="optionsModal">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
-                    <div class="modal-header justify-content-start fs-4 border-0">
+                    <!-- <div class="modal-header justify-content-start fs-4 border-0">
                         <i class="bi bi-gear me-3"></i>
                         [non-functional settings menu in development]
-                    </div>
+                    </div> -->
                     <div class="modal-body">
 
-                        <div class="row g-4 mb-4">
+                        <div class="row g-4 mb-4 mt-2">
                             <div class="col-2 text-end form-switch">
                                 <input type="checkbox" name="option-useDarkMode" id="option-useDarkMode" class="form-check-input">
                             </div>
@@ -186,8 +186,8 @@
                         </div>
                     </div>
 
-                    <div class="modal-footer mt-1 border-0">
-                        <button type="button" class="btn btn-primary">Update</button>
+                    <div class="modal-footer mt-1 border-0 justify-content-center">
+                        <button type="button" class="btn btn-modal border">Close</button>
                     </div>
                 </div>
             </div>
