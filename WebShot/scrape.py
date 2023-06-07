@@ -1,20 +1,15 @@
 """Scraping processes for the application."""
 
 import re
-import time
-import logging
 import requests
 from pathlib import Path
-from urllib.parse import urljoin, urlparse, ParseResult
 from typing import Generator
-from queue import Queue
-from concurrent.futures import ThreadPoolExecutor
-from multiprocessing import Process, Queue as MPQueue
+from multiprocessing import Queue as MPQueue
+from urllib.parse import urljoin, urlparse, ParseResult
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-from selenium.common.exceptions import WebDriverException
 
 
 class Scraper:
