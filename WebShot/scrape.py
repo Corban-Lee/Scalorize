@@ -1,6 +1,7 @@
 """Scraping processes for the application."""
 
 import re
+import json
 import requests
 from pathlib import Path
 from typing import Generator
@@ -39,11 +40,6 @@ class Scraper:
     """
 
     def __init__(self, resolutions: tuple[str], fullscreen: bool):
-        driver_path = "drivers/chrome-win32.exe"
-        options = Options()
-        options.add_argument("--headless")
-        self.driver = lambda: webdriver.Chrome(driver_path, options=options)
-
         self.resolutions = resolutions
         self.fullscreen = fullscreen
 
@@ -117,7 +113,12 @@ class Scraper:
             url = self.url_queue.get()
 
             for image_data, screenshot_filepath in self.process_url(driver, url):
-                yield f'data: {{"screenshotPath": "{str(screenshot_filepath)}", "imageData": "{str(image_data)}"}}\n\n'.replace("\\", "/")
+                data = {"screenshotPath": str(screenshot_filepath), "imageData": str(image_data)}
+                yield f'data: {json.dumps(data)}\n\n'.replace("\\", "/")
+
+        data = {"complete": "true"}
+        yield f'data: {json.dumps(data)}\n\n'
+        driver.quit()
 
     @staticmethod
     def is_redirect(url):

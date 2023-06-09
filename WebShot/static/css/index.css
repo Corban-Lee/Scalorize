@@ -108,9 +108,46 @@ body {
 }
 
 #resultArea {
-    /* display: grid;
-    grid-gap: 15px;
-    grid-template-columns: repeat(auto-fit, 200px);
-    grid-auto-rows: auto;
-    grid-auto-flow: dense; */
+    display: flex !important;
+    flex-wrap: wrap;
+}
+
+#resultArea > div {
+    height: fit-content;
+}
+
+#resolutionOptions > .form-check > button.deleteResolution {
+    display: none !important;
+    overflow-x: hidden;
+    width: 0 !important;
+    transition: width 3s;
+} 
+
+#resolutionOptions > .form-check:hover > button.deleteResolution {
+    display: inline-block !important;
+    width: fit-content !important;
+} 
+
+#resolutionControls:hover #addResolutionCollapse {
+    display: flex !important;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+#resolutionOptions > .form-check .resolution-icon {
+    display: block !important;
+}
+
+#resolutionOptions > .form-check:hover .resolution-icon {
+    display: none !important;
+}
+
+#resolutionOptions > .form-check .resolution-erase {
+    display: none !important;
+}
+
+#resolutionOptions > .form-check:hover .resolution-erase {
+    display: block !important;
 }

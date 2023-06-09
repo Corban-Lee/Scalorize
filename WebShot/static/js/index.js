@@ -94,27 +94,7 @@ $("#searchForm").submit(function(event) {
         $("#taskToast .timer").text(timer.toFixed(1));
     }, 100);
 
-    eventSource.onmessage = (event) => {
-        const data = JSON.parse(event.data)
-        const screenshotPath = data.screenshotPath;
-        const imageData = data.imageData;
-
-        addFiletreeItem(screenshotPath.replace(/\//g, '\\'), browser, imageData);
-
-        if ($(`#resultArea a[href="${screenshotPath}"]`).length === 0) {
-            // col-xxl-2 col-xl-3 col-lg-4 col-sm-6
-            $("#resultArea").append(`
-                <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6" data-item="${screenshotPath}">
-                    <a href="data:image/png;base64,${imageData}" target="_blank">
-                        <img src="data:image/png;base64,${imageData}" class="w-100 rounded border shadow-sm">
-                    </a>
-                </div>
-            `);
-        }
-    }
-
-    eventSource.onerror = () => {
-        console.error("An error occured while trying to connect [eventsource]");
+    function cleanup() {
         eventSource.close();
 
         // Enable UI
@@ -127,6 +107,39 @@ $("#searchForm").submit(function(event) {
         // Hide task
         $("#taskToast").removeClass("show");
         clearInterval(timerInterval);
+
+        console.log("cleaned up [eventsource]")
+    }
+
+    eventSource.onmessage = (event) => {
+        const data = JSON.parse(event.data)
+
+        if (data.complete === "true") {
+            alert("complete");
+            cleanup();
+            return;
+        }
+
+        const screenshotPath = data.screenshotPath;
+        const imageData = data.imageData;
+
+        addFiletreeItem(screenshotPath.replace(/\//g, '\\'), browser, imageData);
+
+        if ($(`#resultArea a[href="${screenshotPath}"]`).length === 0) {
+            // col-xxl-2 col-xl-3 col-lg-4 col-sm-6
+            $("#resultArea").append(`
+                <div class="" style="width: 20%; !important" data-item="${screenshotPath}">
+                    <a href="data:image/png;base64,${imageData}" target="_blank">
+                        <img src="data:image/png;base64,${imageData}" class="w-100 rounded border shadow-sm">
+                    </a>
+                </div>
+            `);
+        }
+    }
+
+    eventSource.onerror = () => {
+        console.error("An error occured while trying to connect [eventsource]");
+        cleanup();
     }
 });
 
@@ -137,12 +150,14 @@ function addFiletreeItem(screenshotPath, browser, imageData) {
 
     for (var i = 0; i < pathParts.length; i++) {
         const path = pathParts.slice(0, i + 1).join("/");
+        const part = pathParts[i];
+
+        $("#taskToast .breadcrumb").append(`<li class="breadcrumb-item">${part}</li>`);
 
         if ($(`li[data-path="${path}"]`).length !== 0) {
             continue;
         }
 
-        const part = pathParts[i];
         const type = i === pathParts.length - 1 ? "file" : "folder";
         const safePath = path.replace(/[.\/]/g, '\\$&')
         const parentPath = pathParts.slice(0, i).join("/");
@@ -158,7 +173,6 @@ function addFiletreeItem(screenshotPath, browser, imageData) {
             imageData: type === "file" ? imageData : null
         }
 
-        $("#taskToast .breadcrumb").append(`<li class="breadcrumb-item">${part}</li>`);
 
         var parent = $(`li[data-path="${safeParentPath}"]`).length > 0 ? $(`#collapse-${safeParentPath}`) : $("#filetree > ul").first();
         showFiletreeItem(item, parent, browser)
@@ -180,7 +194,7 @@ function showFiletreeItem(item, parent, browser) {
     else if (item.type === "folder") {
         const itemElement = $(`
             <li data-path="${item.path}" class="filetree-item folder">
-                <div data-bs-toggle="collapse" data-bs-target="#collapse-${item.path}" role="button">
+                <div data-bs-toggle="collapse" data-bs-target="#collapse-${item.path}" role="button" class="collapsed">
                     <i class="bi bi-chevron-right me-1"></i>
                     <span>${item.name}</span>
                 </div>
@@ -202,24 +216,106 @@ function showFiletreeItem(item, parent, browser) {
     }
 }
 
-$(document).ready(function() {
-    var useDarkMode = localStorage.getItem("option-useDarkMode");
-    setDarkMode(useDarkMode === "true");
+$("#btnCollapseAll").on("click", function() {
+    var $elements = $("#filetree li > div:not(.collapsed)").get().reverse()
+
+    $elements.forEach(function(element) {
+        var $elem = $(element);
+        $elem.addClass("collapsed");
+        $elem.click();
+    });
+});
+  
+$("#btnExpandAll").on("click", function() {
+
+    $("#filetree li > div.collapsed").each(function(index) {
+        var $elem = $(this);    
+        $elem.removeClass("collapsed");
+        $elem.click();
+    });
 });
 
-$("#option-useDarkMode").on("click", function() {
-    const enable = $(this).prop("checked");
-    localStorage.setItem("option-useDarkMode", enable);
-    setDarkMode(enable);
-});
+function addResolution(width, height) {
 
-function setDarkMode(enable) {
-    $("#option-useDarkMode").prop("checked", enable);
+    const resolutionString = `${width}x${height}`;
+    const exists = $(`#resolutionOptions input[value=${resolutionString}]`).length > 0;
 
-    const theme = enable ? "dark" : "light"
-    $(document.body).attr("data-bs-theme", theme);
+    if (exists) {
+        alert("This resolution already exists");
+        return;
+    }
 
-    // Update the logo to match the theme
-    const sidebarLogo = !enable ? logo : logoAlt;
-    $("#brand img").attr("src", sidebarLogo);
+    const icon = width >= height ? "bi-pc-display-horizontal" : "bi-phone"
+    
+    var spacer = "";
+    for (var i = 0; i < 4 - `${width}`.length; i++) {
+        spacer += "&nbsp;&nbsp;"
+    }
+
+    const newElement = $(`
+        <div class="form-check d-flex align-items-center">
+            <input type="checkbox" id="res-${resolutionString}" class="form-check-input mb-1" name="resolutions" value="${resolutionString}">
+            <label for="res-${resolutionString}" class="form-check-label mx-3 flex-grow-1 text-center">
+                ${spacer}${width}
+                <i class="bi bi-x ms-1"></i>
+                ${height}
+            </label>
+            <button class="bg-body border-0 text-body-secondary resolution-icon">
+                <i class="bi ${icon}"></i>
+            </button>
+            <button class="bg-body border-0 text-body-secondary resolution-erase" data>
+                <i class="bi bi-trash3"></i>
+            </button>
+        </div>
+    `);
+
+    $(newElement).find(".resolution-erase").on("click", function() {
+        newElement.remove()
+        updateResolutionStorage(null, resolutionString);
+    });
+
+    $("#resolutionOptions").append(newElement);
+
+    updateResolutionStorage(resolutionString);
 }
+
+function updateResolutionStorage(newResolution=null, removeResolution=null) {
+    var storageItem = localStorage.getItem("resolutions");
+    if (!storageItem) {
+        storageItem = "[]";
+    }
+
+    parsed = JSON.parse(storageItem);
+
+    if (!parsed.includes(newResolution)) {
+        parsed.push(newResolution);
+    }
+    
+    const removeLocation = parsed.indexOf(removeResolution);
+    if (removeLocation > -1) {
+        parsed.splice(removeLocation, 1);
+    }
+
+    localStorage.setItem("resolutions", JSON.stringify(parsed));
+}
+
+$(document).ready(function() {
+    var storageItem = localStorage.getItem("resolutions");
+    if (!storageItem) {
+        storageItem = "[]";
+    }
+
+    parsed = JSON.parse(storageItem);
+    parsed.forEach((resolution) => {
+        addResolution(...resolution.split("x"));
+    })
+});
+
+$("#addResolutionForm").on("submit", function(event) {
+    event.preventDefault();
+
+    const width = $("#addResolutionWidth").val();
+    const height = $("#addResolutionHeight").val();
+
+    addResolution(width, height);
+});
