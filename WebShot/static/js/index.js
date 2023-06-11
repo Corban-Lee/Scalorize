@@ -111,6 +111,9 @@ $("#searchForm").submit(function(event) {
         console.log("cleaned up [eventsource]")
     }
 
+    var previousColumn = -1
+    const maxColumns = $("#resultArea > div").length - 1;
+
     eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data)
 
@@ -125,16 +128,23 @@ $("#searchForm").submit(function(event) {
 
         addFiletreeItem(screenshotPath.replace(/\//g, '\\'), browser, imageData);
 
-        if ($(`#resultArea a[href="${screenshotPath}"]`).length === 0) {
-            // col-xxl-2 col-xl-3 col-lg-4 col-sm-6
-            $("#resultArea").append(`
-                <div class="" style="width: 20%; !important" data-item="${screenshotPath}">
-                    <a href="data:image/png;base64,${imageData}" target="_blank">
-                        <img src="data:image/png;base64,${imageData}" class="w-100 rounded border shadow-sm">
-                    </a>
-                </div>
-            `);
+
+
+        previousColumn ++;
+        if (previousColumn > maxColumns) {
+            previousColumn = 0;
         }
+
+        const column = $("#resultArea > div").eq(previousColumn);
+
+        // col-xxl-2 col-xl-3 col-lg-4 col-sm-6
+        column.append(`
+            <div class="mb-4" style="width: 100%; !important" data-item="${screenshotPath}">
+                <a href="data:image/png;base64,${imageData}" target="_blank">
+                    <img src="data:image/png;base64,${imageData}" class="w-100 rounded border shadow-sm">
+                </a>
+            </div>
+        `);
     }
 
     eventSource.onerror = () => {
@@ -245,20 +255,21 @@ function addResolution(width, height) {
         return;
     }
 
-    const icon = width >= height ? "bi-pc-display-horizontal" : "bi-phone"
+    const icon = width >= height ? "bi-pc-display-horizontal" : "bi-phone";
     
-    var spacer = "";
-    for (var i = 0; i < 4 - `${width}`.length; i++) {
-        spacer += "&nbsp;&nbsp;"
-    }
+    // Spacers keep the text aligned correctly
+    const widthSpacer = "&nbsp;".repeat(Math.max(0, 4 - `${width}`.length));
+    const heightSpacer = "&nbsp;".repeat(Math.max(0, 4 - `${height}`.length));
 
     const newElement = $(`
         <div class="form-check d-flex align-items-center">
             <input type="checkbox" id="res-${resolutionString}" class="form-check-input mb-1" name="resolutions" value="${resolutionString}">
-            <label for="res-${resolutionString}" class="form-check-label mx-3 flex-grow-1 text-center">
-                ${spacer}${width}
+            <label for="res-${resolutionString}" class="monospace form-check-label mx-3 flex-grow-1 text-center">
+                <small>
+                ${widthSpacer}${width}
                 <i class="bi bi-x ms-1"></i>
-                ${height}
+                ${height}${heightSpacer}
+                </small>
             </label>
             <button class="bg-body border-0 text-body-secondary resolution-icon">
                 <i class="bi ${icon}"></i>
