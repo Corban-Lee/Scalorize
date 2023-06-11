@@ -4,6 +4,15 @@
     src: url("/static/fonts/Helios-Light.ttf");
 }
 
+@font-face {
+    font-family: "JetBrains Mono";
+    src: url("/static/fonts/JetBrainsMono-Light.ttf");
+}
+
+.monospace {
+    font-family: "JetBrains Mono" !important;
+}
+
 body {
     font-family: "Helios";
     min-height: 100vh;
