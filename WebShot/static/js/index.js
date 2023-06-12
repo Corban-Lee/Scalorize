@@ -280,7 +280,7 @@ function addResolution(width, height) {
     const heightSpacer = "&nbsp;".repeat(Math.max(0, 4 - `${height}`.length));
 
     const newElement = $(`
-        <div class="form-check d-flex align-items-center">
+        <div class="form-check d-flex align-items-center pb-1">
             <input type="checkbox" id="res-${resolutionString}" class="form-check-input mb-1" name="resolutions" value="${resolutionString}">
             <label for="res-${resolutionString}" class="monospace form-check-label mx-3 flex-grow-1 text-center small">
                 ${widthSpacer}${width}
