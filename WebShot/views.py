@@ -15,8 +15,9 @@ def stream_screenshots():
     browser = request.args.get("browser")
     resolutions = request.args.getlist("resolution")
     fullscreen = request.args.get("fullscreen") == "true"
+    save_to_disk = request.args.get("saveToDisk") == "true"
 
-    scraper = Scraper(resolutions, fullscreen)
+    scraper = Scraper(resolutions, fullscreen, save_to_disk)
     capture_generator = lambda: scraper.stream_screenshots_generator(url, browser)
 
     response = make_response(Response(capture_generator(), mimetype="text/event-stream"))

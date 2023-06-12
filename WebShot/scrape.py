@@ -39,9 +39,10 @@ class Scraper:
         Creates and returns an absolute URL from the given base and relative URLs.
     """
 
-    def __init__(self, resolutions: tuple[str], fullscreen: bool):
+    def __init__(self, resolutions: tuple[str], fullscreen: bool, save_to_disk: bool):
         self.resolutions = resolutions
         self.fullscreen = fullscreen
+        self.save_to_disk = save_to_disk
 
         self.initial_url: ParseResult = None
         self.visited_urls = set()
@@ -217,6 +218,11 @@ class Scraper:
     def capture(self, driver) -> str:
         """
         Captures a screenshot and saves it to disk.
+
+        Parameters
+        ----------
+        driver : WebDriver object
+            The WebDriver used to capture the screenshot
 
         Returns
         -------

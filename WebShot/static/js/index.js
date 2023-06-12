@@ -71,6 +71,9 @@ $("#searchForm").submit(function(event) {
     const fullScreenshot = $("#option-fullScreenshot").prop("checked");
     eventSourceUrl += `&fullscreen=${fullScreenshot}`;
 
+    const saveToDisk = $("#option-saveToDisk").prop("checked");
+    eventSourceUrl += `&saveToDisk=${saveToDisk}`;
+
     var eventSource = new EventSource(eventSourceUrl);
 
     $(window).off("beforeunload").on("beforeunload", function() {
