@@ -1,4 +1,9 @@
 
+$(document).ready(function() {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+});
+
 /**
  * Generates a random unique ID
  */
@@ -52,7 +57,7 @@ $("#searchForm").submit(function(event) {
     var resolutions = $("input[name='resolutions']:checked").map(function() { return $(this).val(); }).get();
 
     if (!resolutions.length) {
-        alert("Please select a resolution from the captures dropdown");
+        alert("Please select a resolution from the dropdown");
         return;
     }
 
@@ -173,8 +178,10 @@ function addFiletreeItem(screenshotPath, browser, imageData) {
         const parentPath = pathParts.slice(0, i).join("/");
         const safeParentPath = parentPath.replace(/[.\/]/g, '\\$&');
 
+        const name = type === "file" ? part.replace(".png", "") : part
+
         var item = {
-            name: part,
+            name: name,
             type: type,
             path: path,
             safePath: safePath,
@@ -227,6 +234,12 @@ function showFiletreeItem(item, parent, browser) {
 }
 
 $("#btnCollapseAll").on("click", function() {
+
+    if (!$("#filetree ul").first().html()) {
+        alert("There are no files to collapse");
+        return;
+    }
+
     var $elements = $("#filetree li > div:not(.collapsed)").get().reverse()
 
     $elements.forEach(function(element) {
@@ -237,6 +250,11 @@ $("#btnCollapseAll").on("click", function() {
 });
   
 $("#btnExpandAll").on("click", function() {
+
+    if (!$("#filetree ul").first().html()) {
+        alert("There are no files to expand");
+        return;
+    }
 
     $("#filetree li > div.collapsed").each(function(index) {
         var $elem = $(this);    
@@ -264,17 +282,15 @@ function addResolution(width, height) {
     const newElement = $(`
         <div class="form-check d-flex align-items-center">
             <input type="checkbox" id="res-${resolutionString}" class="form-check-input mb-1" name="resolutions" value="${resolutionString}">
-            <label for="res-${resolutionString}" class="monospace form-check-label mx-3 flex-grow-1 text-center">
-                <small>
+            <label for="res-${resolutionString}" class="monospace form-check-label mx-3 flex-grow-1 text-center small">
                 ${widthSpacer}${width}
                 <i class="bi bi-x ms-1"></i>
-                ${height}${heightSpacer}
-                </small>
+                ${heightSpacer}${height}
             </label>
-            <button class="bg-body border-0 text-body-secondary resolution-icon">
+            <button class="bg-body border-0 text-body-secondary resolution-icon p-0">
                 <i class="bi ${icon}"></i>
             </button>
-            <button class="bg-body border-0 text-body-secondary resolution-erase" data>
+            <button class="bg-body border-0 text-body-secondary resolution-erase p-0" data>
                 <i class="bi bi-trash3"></i>
             </button>
         </div>
@@ -325,8 +341,11 @@ $(document).ready(function() {
 $("#addResolutionForm").on("submit", function(event) {
     event.preventDefault();
 
-    const width = $("#addResolutionWidth").val();
-    const height = $("#addResolutionHeight").val();
+    const width = parseInt($("#addResolutionWidth").val());
+    const height = parseInt($("#addResolutionHeight").val());
+
+    $("#addResolutionWidth").val("");
+    $("#addResolutionHeight").val("");
 
     addResolution(width, height);
 });
