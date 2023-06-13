@@ -147,12 +147,21 @@ $("#searchForm").submit(function(event) {
 
         // col-xxl-2 col-xl-3 col-lg-4 col-sm-6
         column.append(`
-            <div class="mb-4" style="width: 100%; !important" data-item="${screenshotPath}">
+            <div class="mb-4 w-100 position-relative" !important" data-item="${screenshotPath}">
                 <a href="data:image/png;base64,${imageData}" target="_blank">
-                    <img src="data:image/png;base64,${imageData}" class="w-100 rounded border shadow-sm">
+                    <img src="data:image/png;base64,${imageData}" class="w-100 rounded border shadow">
                 </a>
             </div>
         `);
+        // <div class="position-absolute top-0 start-0 m-3">
+        //             <div class="px-3 py-2 rounded bg-body-tertiary border bg-opacity-75 mb-3">
+        //                 ${screenshotPath}
+        //             </div>
+        //             <div class="px-3 py-2 rounded bg-body-tertiary border bg-opacity-75 text-center" style="width: fit-content">
+        //                 <i class="bi bi-browser-firefox me-2"></i>
+        //                 <span class="">1920x1080</span>
+        //             </div>
+        //         </div>
     }
 
     eventSource.onerror = () => {
