@@ -1,26 +1,56 @@
-"""Handle views for the application."""
+"""
+Handle views for the application.
+"""
 
-from flask import Blueprint, render_template, request, Response, send_file, make_response
-from scrape import Scraper
+import json
+import asyncio
+import gevent
+# from flask import Blueprint, render_template, request, send_file, Response, make_response, stream_with_context
+from quart import Blueprint, render_template, request, send_file, Response, make_response
+
+from webscraper import WebScraper
 
 index_blueprint = Blueprint("index", __name__)
 
 @index_blueprint.route("/")
-def index():
-    return render_template("index.html")
+async def index():
+    return await render_template("index.html")
+
+async def capture_generator(url: str, browser: str, resolutions: tuple[str], fullscreen: bool, save_to_disk: bool):
+    """
+
+    """
+
+    scraper = WebScraper(browser, resolutions, fullscreen, save_to_disk)
+    asyncio.create_task(scraper.stream_content_generator(url))
+
+    while True:
+        screenshot_data = await scraper.get_next_screenshot()
+        if screenshot_data.get("complete", False):
+            break
+
+        data = f"data:{json.dumps(screenshot_data)}\n\n"
+        # print(f"{screenshot_data!r}")
+        yield data
 
 @index_blueprint.route("/stream-screenshots")
-def stream_screenshots():
+async def stream_screenshots():
+    """
+
+    """
+
+    # Request Data
     url = request.args.get("url")
     browser = request.args.get("browser")
     resolutions = request.args.getlist("resolution")
     fullscreen = request.args.get("fullscreen") == "true"
     save_to_disk = request.args.get("saveToDisk") == "true"
 
-    scraper = Scraper(resolutions, fullscreen, save_to_disk)
-    capture_generator = lambda: scraper.stream_screenshots_generator(url, browser)
+    # Screenshot Generator
+    capture_gen =  capture_generator(url, browser, resolutions, fullscreen, save_to_disk)
 
-    response = make_response(Response(capture_generator(), mimetype="text/event-stream"))
+    # Response
+    response = await make_response(Response(capture_gen, mimetype="text/event-stream"))
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
@@ -28,5 +58,5 @@ def stream_screenshots():
     return response
 
 @index_blueprint.route("/output/<path:filename>")
-def serve_file(filename):
+async def serve_file(filename):
     return send_file("../output/" + filename)

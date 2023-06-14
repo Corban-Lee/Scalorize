@@ -131,12 +131,10 @@ $("#searchForm").submit(function(event) {
             return;
         }
 
-        const screenshotPath = data.screenshotPath;
+        // const screenshotPath = data.screenshotPath;
         const imageData = data.imageData;
 
-        addFiletreeItem(screenshotPath.replace(/\//g, '\\'), browser, imageData);
-
-
+        // addFiletreeItem(screenshotPath.replace(/\//g, '\\'), browser, imageData);
 
         previousColumn ++;
         if (previousColumn > maxColumns) {
@@ -144,12 +142,13 @@ $("#searchForm").submit(function(event) {
         }
 
         const column = $("#resultArea > div").eq(previousColumn);
-
         // col-xxl-2 col-xl-3 col-lg-4 col-sm-6
+        // data-item="${screenshotPath}" 
+        // href="data:image/png;base64,${imageData}" target="_blank"
         column.append(`
-            <div class="mb-4 w-100 position-relative" !important" data-item="${screenshotPath}">
-                <a href="data:image/png;base64,${imageData}" target="_blank">
-                    <img src="data:image/png;base64,${imageData}" class="w-100 rounded border shadow">
+            <div class="mb-4 w-100 position-relative" !important" >
+                <a href="#">
+                    <img src="data:image/png;base64,${imageData}" class="w-100 rounded border shadow" alt="image">
                 </a>
             </div>
         `);
@@ -294,7 +293,7 @@ function addResolution(width, height) {
     const newElement = $(`
         <div class="form-check d-flex align-items-center pb-1">
             <input type="checkbox" id="res-${resolutionString}" class="form-check-input mb-1" name="resolutions" value="${resolutionString}">
-            <label for="res-${resolutionString}" class="monospace form-check-label mx-3 flex-grow-1 text-center small">
+            <label for="res-${resolutionString}" class="form-check-label mx-3 flex-grow-1 text-center small">
                 ${widthSpacer}${width}
                 <i class="bi bi-x ms-1"></i>
                 ${heightSpacer}${height}
