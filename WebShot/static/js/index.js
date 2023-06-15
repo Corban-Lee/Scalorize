@@ -75,6 +75,7 @@ $("#searchForm").submit(function(event) {
     eventSourceUrl += `&saveToDisk=${saveToDisk}`;
 
     var eventSource = new EventSource(eventSourceUrl);
+    eventSource.timeout = 60000;
 
     $(window).off("beforeunload").on("beforeunload", function() {
         return "Are you sure you want to leave this page? Your progress will be lost.";
@@ -163,8 +164,11 @@ $("#searchForm").submit(function(event) {
         //         </div>
     }
 
-    eventSource.onerror = () => {
-        console.error("An error occured while trying to connect [eventsource]");
+    eventSource.onerror = (event) => {
+        console.log('An error occurred with the EventSource:');
+        console.log('Event:', event);
+        console.log('Target:', event.target);
+        console.log('Message:', event.message);
         cleanup();
     }
 });
@@ -291,18 +295,18 @@ function addResolution(width, height) {
     const heightSpacer = "&nbsp;".repeat(Math.max(0, 4 - `${height}`.length));
 
     const newElement = $(`
-        <div class="form-check d-flex align-items-center pb-1">
-            <input type="checkbox" id="res-${resolutionString}" class="form-check-input mb-1" name="resolutions" value="${resolutionString}">
-            <label for="res-${resolutionString}" class="form-check-label mx-3 flex-grow-1 text-center small">
-                ${widthSpacer}${width}
+        <div class="form-check d-flex align-items-center pb-1 ms-2">
+            <input type="checkbox" id="res-${resolutionString}" class="form-check-input mb-1 fs-5" name="resolutions" value="${resolutionString}">
+            <label for="res-${resolutionString}" class="form-check-label mx-3 flex-grow-1 text-center">
+                ${widthSpacer}${wtaskth}
                 <i class="bi bi-x ms-1"></i>
                 ${heightSpacer}${height}
             </label>
-            <button class="bg-body border-0 text-body-secondary resolution-icon p-0">
-                <i class="bi ${icon}"></i>
+            <button class="bg-body-tertiary border-0 text-body-secondary resolution-icon p-0">
+                <i class="bi ${icon} fs-5"></i>
             </button>
-            <button class="bg-body border-0 text-body-secondary resolution-erase p-0" data>
-                <i class="bi bi-trash3"></i>
+            <button class="bg-body-tertiary border-0 text-body-secondary resolution-erase p-0" data>
+                <i class="bi bi-trash3 fs-5"></i>
             </button>
         </div>
     `);

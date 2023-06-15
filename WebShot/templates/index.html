@@ -12,36 +12,34 @@
 </head>
 <body>
     <div id="root">
-        <div class="p-3 bg-body-tertiary border-end" id="sidebar">
+        <div class="p-4 bg-body-tertiary shadow overflow-auto" id="sidebar">
 
             <!-- Branding -->
-            <a href="/" class="w-100" id="brand">
-                <img src="{{ url_for('static', filename='images/logo-title.png') }}" alt="product logo" height="35">
+            <a href="/" id="brand" class="w-100 mb-4 pb-2 text-center">
+                <img src="{{ url_for('static', filename='images/logo-title.png') }}" alt="product logo" height="40">
             </a>
 
-            <hr>
-
             <form id="searchForm">
-                <div class="input-group mb-3">
-                    <input class="form-control" type="search" name="search" id="search" placeholder="https://example.com">
-                    <button type="submit" class="btn btn-sidebar border border-start-0 rounded-start-0" id="searchBtn">
+                <div class="input-group mb-3 shadow-sm">
+                    <input class="form-control border-0" type="search" name="search" id="search" placeholder="https://example.com">
+                    <button type="submit" class="btn btn-sidebar rounded-start-0" id="searchBtn">
                         <i class="bi bi-search"></i>
                     </button>
                 </div>
                 <div class="d-flex flex-wrap justify-content-between align-items-center">
                     <div class="d-flex">
-                        <button type="button" id="btnResolutions" class="btn btn-sidebar border dropdown-toggle me-2 mb-3 collapsed" data-bs-toggle="collapse" data-bs-target="#searchOptions">
+                        <button type="button" id="btnResolutions" class="btn btn-sidebar shadow-sm dropdown-toggle mb-3 me-3 collapsed" data-bs-toggle="collapse" data-bs-target="#searchOptions">
                             <i class="bi bi-sliders2-vertical"></i>
                         </button>
-                        <button type="button" class="btn btn-sidebar border mb-3 me-2" data-bs-toggle="modal" data-bs-target="#optionsModal">
+                        <button type="button" class="btn btn-sidebar shadow-sm mb-3 me-3" data-bs-toggle="modal" data-bs-target="#optionsModal">
                             <i class="bi bi-gear"></i>
                         </button>
                     </div>
                     <div class="d-flex">
-                        <button type="button" id="btnExpandAll" class="btn btn-sidebar border mb-3 me-2">
+                        <button type="button" id="btnExpandAll" class="btn btn-sidebar shadow-sm mb-3 me-3">
                             <i class="bi bi-chevron-double-down"></i>
                         </button>
-                        <button type="button" id="btnCollapseAll" class="btn btn-sidebar border mb-3">
+                        <button type="button" id="btnCollapseAll" class="btn btn-sidebar shadow-sm mb-3">
                             <i class="bi bi-chevron-double-up"></i>
                         </button>
                     </div>
@@ -50,52 +48,52 @@
 
             <!-- Drivers Dropdown -->
             <div id="searchOptions" class="collapse">
-                <div id="driversOptions" class="sidebar-container mb-3 border w-100 rounded px-4 py-3">
+                <div id="driversOptions" class="sidebar-container overflow-auto mb-3 w-100 px-2 pt-4 pb-3">
 
-                    <h3 class="h6 mb-0 d-flex justify-content-between">
+                    <h3 class="h5 mb-4 d-flex justify-content-between">
                         <span class="small">
-                            WebDrivers
+                            <span class="pe-4">Drivers</span>
                         </span>
-                        <i class="bi bi-info-circle text-info-emphasis" data-bs-toggle="tooltip" data-bs-title="Choose your preferred browser for automated control" data-bs-placement="bottom"></i>
+                        <span class="small">
+                            <i class="bi bi-info-circle text-info" data-bs-toggle="tooltip" data-bs-title="Choose your preferred browser for automated control" data-bs-placement="bottom"></i>
+                        </span>
                     </h3>
-                    <hr>
 
                     <div class="form-check d-flex align-items-center pb-1">
-                        <label for="driver-chrome" class="form-check-label d-flex flex-grow-1 justify-content-between">
-                            <input type="radio" id="driver-chrome" class="ps-0 form-check-input mb-1" name="drivers" value="chrome">
-                            <span class="small">Chrome</span>
+                        <label for="driver-chrome" class="form-check-label d-flex flex-grow-1 justify-content-between fs-5 ps-2">
+                            <input type="radio" id="driver-chrome" class="form-check-input mb-1" name="drivers" value="chrome">
+                            <span class="fs-6">Chrome</span>
                             <i class="bi bi-browser-chrome text-body-secondary"></i>
                         </label>
                     </div>
                     <div class="form-check d-flex align-items-center pb-1">
-                        <label for="driver-firefox" class="form-check-label d-flex flex-grow-1 justify-content-between">
-                            <input type="radio" id="driver-firefox" class="ps-0 form-check-input mb-1" name="drivers" value="firefox">
-                            <span class="small">Firefox</span>
+                        <label for="driver-firefox" class="form-check-label d-flex flex-grow-1 justify-content-between fs-5 ps-2">
+                            <input type="radio" id="driver-firefox" class="form-check-input mb-1" name="drivers" value="firefox">
+                            <span class="fs-6">Firefox</span>
                             <i class="bi bi-browser-firefox text-body-secondary"></i>
                         </label>
                     </div>
                     <div class="form-check d-flex align-items-center pb-1">
-                        <label for="driver-edge" class="form-check-label d-flex flex-grow-1 justify-content-between">
+                        <label for="driver-edge" class="form-check-label d-flex flex-grow-1 justify-content-between fs-5 ps-2">
                             <input type="radio" id="driver-edge" class="ps-0 form-check-input mb-1" name="drivers" value="edge">
-                            <span class="small">Edge</span>
+                            <span class="fs-6">Edge</span>
                             <i class="bi bi-browser-edge text-body-secondary"></i>
                         </label>
                     </div>
 
-                    <div id="resolutionOptions" class="mt-4">
-                        <h3 class="h6 mb-0 d-flex justify-content-between">
+                    <div id="resolutionOptions" class="mt-4 pt-3">
+                        <h3 class="h5 mb-4 d-flex justify-content-between">
                             <span class="small">
-                                Resolutions
+                                <span class="pe-4">Resolutions</span>
                             </span>
-                            <span>
-                                <span class="d-inline-block" data-bs-toggle="tooltip" data-bs-title="Add new resolution" data-bs-placement="bottom">
-                                    <i class="bi bi-plus-circle text-success-emphasis" role="button" data-bs-toggle="modal" data-bs-target="#resolutionModal"></i>
-                                </span>
-                                <i class="bi bi-info-circle text-info-emphasis ms-1" data-bs-toggle="tooltip" data-bs-title="Select your desired screen resolutions for the webdriver" data-bs-placement="bottom"></i>
+                            <span class="small">
+                                <i class="bi bi-info-circle text-info ms-1" data-bs-toggle="tooltip" data-bs-title="Select your desired screen resolutions for the webdriver" data-bs-placement="bottom"></i>
                             </span>
                         </h3>
-                        <hr>
                     </div>
+                    <button type="button" class="btn btn-sidebar shadow-sm w-100 mt-4" data-bs-toggle="modal" data-bs-target="#resolutionModal">
+                        Add Resolution
+                    </button>
                 </div>
 
                 <!-- Add Resolution Controls -->
@@ -159,14 +157,14 @@
                                     </div>
                                     <input type="number" id="addResolutionHeight" class="form-control border-start-0" name="addResolutionHeight" placeholder="height" required>
                                 </div>
-                                <button type="submit" id="addResolution" class="btn ms-3 btn-sidebar border">
+                                <button type="submit" id="addResolution" class="btn ms-3 btn-sidebar shadow-sm">
                                     <i class="bi bi-plus-lg"></i>
                                 </button>
                             </form>
                         </div>
                     </div>
                     <div class="modal-footer mt-1 border-0 justify-content-center">
-                        <button type="button" class="btn btn-sidebar border" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-sidebar shadow-sm" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -251,7 +249,7 @@
                     </div>
 
                     <div class="modal-footer mt-1 border-0 justify-content-center">
-                        <button type="button" class="btn btn-sidebar border" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-sidebar shadow-sm" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>

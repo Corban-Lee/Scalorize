@@ -21,17 +21,17 @@ async def capture_generator(url: str, browser: str, resolutions: tuple[str], ful
 
     """
 
-    scraper = WebScraper(browser, resolutions, fullscreen, save_to_disk)
+    scraper = WebScraper(browser, resolutions, fullscreen, save_to_disk, 4)
     asyncio.create_task(scraper.stream_content_generator(url))
 
     while True:
-        screenshot_data = await scraper.get_next_screenshot()
-        if screenshot_data.get("complete", False):
-            break
+        screenshot_data = scraper.get_next_screenshot()
+        async for data in screenshot_data:
+            if data.get("complete", False):
+                break
 
-        data = f"data:{json.dumps(screenshot_data)}\n\n"
-        # print(f"{screenshot_data!r}")
-        yield data
+            data = f"data:{json.dumps(data)}\n\n"
+            yield data
 
 @index_blueprint.route("/stream-screenshots")
 async def stream_screenshots():
