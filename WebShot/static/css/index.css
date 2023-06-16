@@ -101,10 +101,10 @@ body {
 
 .btn-sidebar.dropdown-toggle:not(.collapsed) {
     color: var(--bs-body-color) !important;
-    background-color: rgba(var(--bs-secondary-bg-rgb), 0.5) !important;
+    background-color: var(--bs-body-bg) !important;
 }
 
-.btn-sidebar:hover {
+.btn-sidebar:not(:disabled):hover {
     background-color: rgba(var(--bs-secondary-bg-rgb), 0.3) !important;
 }
 

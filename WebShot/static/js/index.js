@@ -74,8 +74,10 @@ $("#searchForm").submit(function(event) {
     const saveToDisk = $("#option-saveToDisk").prop("checked");
     eventSourceUrl += `&saveToDisk=${saveToDisk}`;
 
+    const semaphoreLimit = $("#option-semaphoreLimit").val();
+    eventSourceUrl += `&semaphoreLimit=${semaphoreLimit}`;
+
     var eventSource = new EventSource(eventSourceUrl);
-    eventSource.timeout = 60000;
 
     $(window).off("beforeunload").on("beforeunload", function() {
         return "Are you sure you want to leave this page? Your progress will be lost.";
@@ -298,7 +300,7 @@ function addResolution(width, height) {
         <div class="form-check d-flex align-items-center pb-1 ms-2">
             <input type="checkbox" id="res-${resolutionString}" class="form-check-input mb-1 fs-5" name="resolutions" value="${resolutionString}">
             <label for="res-${resolutionString}" class="form-check-label mx-3 flex-grow-1 text-center">
-                ${widthSpacer}${wtaskth}
+                ${widthSpacer}${width}
                 <i class="bi bi-x ms-1"></i>
                 ${heightSpacer}${height}
             </label>

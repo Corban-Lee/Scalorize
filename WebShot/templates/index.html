@@ -27,19 +27,19 @@
                     </button>
                 </div>
                 <div class="d-flex flex-wrap justify-content-between align-items-center">
-                    <div class="d-flex">
-                        <button type="button" id="btnResolutions" class="btn btn-sidebar shadow-sm dropdown-toggle mb-3 me-3 collapsed" data-bs-toggle="collapse" data-bs-target="#searchOptions">
+                    <div class="d-flex btn-group me-3 shadow-sm mb-3">
+                        <button type="button" id="btnResolutions" class="btn btn-sidebar dropdown-toggle rounded-end-0 collapsed" data-bs-toggle="collapse" data-bs-target="#searchOptions">
                             <i class="bi bi-sliders2-vertical"></i>
                         </button>
-                        <button type="button" class="btn btn-sidebar shadow-sm mb-3 me-3" data-bs-toggle="modal" data-bs-target="#optionsModal">
+                        <button type="button" class="btn btn-sidebar" data-bs-toggle="modal" data-bs-target="#optionsModal">
                             <i class="bi bi-gear"></i>
                         </button>
                     </div>
-                    <div class="d-flex">
-                        <button type="button" id="btnExpandAll" class="btn btn-sidebar shadow-sm mb-3 me-3">
+                    <div class="d-flex btn-group shadow-sm mb-3">
+                        <button type="button" id="btnExpandAll" class="btn btn-sidebar">
                             <i class="bi bi-chevron-double-down"></i>
                         </button>
-                        <button type="button" id="btnCollapseAll" class="btn btn-sidebar shadow-sm mb-3">
+                        <button type="button" id="btnCollapseAll" class="btn btn-sidebar">
                             <i class="bi bi-chevron-double-up"></i>
                         </button>
                     </div>
@@ -74,10 +74,10 @@
                         </label>
                     </div>
                     <div class="form-check d-flex align-items-center pb-1">
-                        <label for="driver-edge" class="form-check-label d-flex flex-grow-1 justify-content-between fs-5 ps-2">
-                            <input type="radio" id="driver-edge" class="ps-0 form-check-input mb-1" name="drivers" value="edge">
-                            <span class="fs-6">Edge</span>
-                            <i class="bi bi-browser-edge text-body-secondary"></i>
+                        <label for="driver-safari" class="form-check-label d-flex flex-grow-1 justify-content-between fs-5 ps-2">
+                            <input type="radio" id="driver-safari" class="ps-0 form-check-input mb-1" name="drivers" value="safari">
+                            <span class="fs-6">Safari</span>
+                            <i class="bi bi-browser-safari text-body-secondary"></i>
                         </label>
                     </div>
 
@@ -188,6 +188,24 @@
                                         <span class="text-secondary-emphasis">Use Dark Mode</span>
                                         <br>
                                         <small class="text-body-secondary">Use darker colours for this application.</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="row g-4 mb-4 mt-2">
+                            <div class="col-2 d-flex justify-content-end align-items-start">
+                                <input type="number" name="option-semaphoreLimit" id="option-semaphoreLimit" class="form-control form-control-sm" style="width: 40px" value="10">
+                            </div>
+                            <div class="col-10">
+                                <label for="option-semaphoreLimit" class="d-flex flex-row">
+                                    <div class="me-3">
+                                        <i class="bi bi-lock"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-secondary-emphasis">Concurrent Processes Limit</span>
+                                        <br>
+                                        <small class="text-body-secondary">Higher number = faster results, but be warned, higher number = higher memory usage = fucks your computer up.</small>
                                     </div>
                                 </label>
                             </div>

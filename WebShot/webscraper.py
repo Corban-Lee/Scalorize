@@ -15,12 +15,12 @@ class WebScraper:
     Scrapes content from the web. Data can be retrieved from the `get_screenshot_data` AsyncGenerator method.
     """
 
-    def __init__(self, browser_name: str, resolutions:tuple[str], fullscreen: bool, save_to_disk: bool, semaphores: int):
+    def __init__(self, browser_name: str, resolutions:tuple[str], fullscreen: bool, save_to_disk: bool, semaphore_limit: int):
         self.resolutions = resolutions
         self.fullscreen = fullscreen
         self.save_to_disk = save_to_disk
         self.browser_name = browser_name
-        self.semaphores = semaphores
+        self.semaphore_limit = semaphore_limit
 
         self.complete = False
         self.initial_url = None
@@ -33,51 +33,63 @@ class WebScraper:
         Streams scraped content back to the application front end.
         """
 
-        await self.url_queue.put(url)
-        self.initial_url = urlparse(url)
-        self.initial_url_str = url
+        try:
 
-        async with async_playwright() as playwright:
-            browser_options = {
-                "chrome": playwright.chromium,
-                "edge": playwright.chromium,
-                "firefox": playwright.firefox,
-                "safari": playwright.webkit
-            }
+            await self.url_queue.put(url)
+            self.initial_url = urlparse(url)
+            self.initial_url_str = url
 
-            browser = await browser_options[self.browser_name].launch()
-            self.browser = browser
+            async with async_playwright() as playwright:
+                browser_options = {
+                    "chrome": playwright.chromium,
+                    "edge": playwright.chromium,
+                    "firefox": playwright.firefox,
+                    "safari": playwright.webkit
+                }
 
-            tasks = []
-            semaphore = asyncio.Semaphore(self.semaphores)
+                browser = await browser_options[self.browser_name].launch()
+                self.browser = browser
 
-            while not self.url_queue.empty() or tasks:
+                tasks = []
+                semaphore = asyncio.Semaphore(self.semaphore_limit)
 
-                async with semaphore:
-                    current_url = await self.url_queue.get()
-                    self.process_url(current_url)
+                while not self.url_queue.empty() or tasks:
+                    print(f"queue size: {self.url_queue.qsize()} | tasks: {len(tasks)}")
+                    # Limit the maximum number of concurrent tasks
+                    if len(tasks) >= self.semaphore_limit:
+                        await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+                        tasks = [task for task in tasks if not task.done()]
+                    else:
+                        url = await self.url_queue.get()
+                        self.visited_urls.add(url)
+                        tasks.append(asyncio.create_task(self.process_url(url, semaphore)))
 
-                tasks.append(asyncio.create_task(self.process_url(current_url)))
-                tasks = [task for task in tasks if not task.done()]
+                await asyncio.gather(*tasks)
 
-            await asyncio.gather(*tasks)
+        except Exception as error:
+            print(f"ERROR: {error.with_traceback()}")
 
+        print("completed tasks")
         self.screenshot_queue.put(None)
         self.complete = True
 
-    async def process_url(self, url: str):
+    async def process_url(self, url: str, semaphore: asyncio.Semaphore):
         """
         Process a URL.
         """
 
-        self.visited_urls.add(url)
+        async with semaphore:
 
-        print("Processing URL " + url)
-        page = await self.browser.new_page(base_url=self.initial_url_str)
-        await page.goto(url, timeout=0, wait_until="commit")
-        await self.screenshot(page)
-        await self.queue_hrefs(page)
-        await page.close()
+            # now = time.time()
+            page = await self.browser.new_page(base_url=self.initial_url_str)
+            await page.goto(url, timeout=30000, wait_until="domcontentloaded")
+            await self.screenshot(page)
+            # print(f"screenshot {url} in {round(time.time() - now, 2)} seconds")
+            hrefs = [await anchor.get_attribute("href") for anchor in await page.query_selector_all("a[href]")]
+            await page.close(run_before_unload=True)
+            # print(f"done with {url} in {round(time.time() - now, 2)} seconds")
+
+        asyncio.ensure_future(self.queue_hrefs(hrefs))
 
     async def screenshot(self, page):
         """
@@ -93,18 +105,15 @@ class WebScraper:
             encoded_data = encoded_data.replace("\n", "")
 
             await self.screenshot_queue.put(encoded_data)
+            print("data has beed added to the screenshot queue")
 
-    async def queue_hrefs(self, page):
+    async def queue_hrefs(self, hrefs: list[str]):
         """
         Queue up the href content found on the given page.
         """
 
-        for anchor in await page.query_selector_all("a"):
-            href = await anchor.get_attribute("href")
-            if not href:
-                continue
-
-            processed_href = self.process_href(href)
+        for href in hrefs:
+            processed_href = self.process_href(href) if href else None
             if not processed_href:
                 continue
 
@@ -137,7 +146,10 @@ class WebScraper:
         Generator function. Yields from the screenshot queue.
         """
 
+        now = time.time()
+        print("waiting for screenshot...")
         screenshot_data = await self.screenshot_queue.get()
+        print(f"screenshot obtained in {round(time.time() - now, 2)} seconds!")
         yield {
             "imageData": str(screenshot_data),
             "complete": self.complete
