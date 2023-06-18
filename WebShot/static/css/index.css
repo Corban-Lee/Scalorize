@@ -40,19 +40,50 @@ body {
     overflow: auto !important;
 }
 
+/* #filetree li.filetree-item {
+    height: 36px;
+    display: flex;
+    align-items: center;
+}
+
+#filetree li.filetree-item:hover {
+    background-color: var(--bs-body-bg) !important;
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+} */
+
+#filetree ul {
+    list-style-type: none;    
+    overflow-x: visible;
+    width: fit-content;
+}
+
+#filetree ul > li {
+    overflow-x: visible;
+    width: fit-content;
+}
+
+#filetree ul > li > div {
+    display: flex;
+    white-space: nowrap;
+    width: fit-content;
+}
+
 #filetree > ul {
-    list-style-type: none;
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    overflow: visible ;
     display: flex;
     flex-direction: column;
     margin-bottom: auto;
     width: fit-content;
 }
 
-/* .filetree-item {
-} */
+#filetree ul > li > div > button > i.bi {
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+/* 
 
 .filetree-item a, .filetree-item div {
     color: var(--bs-body-color);
@@ -67,10 +98,7 @@ body {
 .filetree-item a i.bi, .filetree-item div i.bi {
     transition: transform 0.3s ease;
 }
-
-.filetree-item ul {
-    list-style-type: none;
-}
+*/
 
 .no-text-highlight {
     -webkit-user-select: none; /* Safari */
@@ -121,14 +149,14 @@ body {
     background-color: var(--bs-secondary-bg) !important;
 }
 
-#resultArea {
+/* #resultArea {
     display: flex !important;
     flex-wrap: wrap;
 }
 
 #resultArea > div {
     height: fit-content;
-}
+} */
 
 #resolutionOptions > .form-check > button.deleteResolution {
     display: none !important;

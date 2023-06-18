@@ -122,8 +122,8 @@ $("#searchForm").submit(function(event) {
         console.log("cleaned up [eventsource]")
     }
 
-    var previousColumn = -1
-    const maxColumns = $("#resultArea > div").length - 1;
+    // var previousColumn = -1
+    // const maxColumns = $("#resultArea > div").length - 1;
 
     eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data)
@@ -135,26 +135,36 @@ $("#searchForm").submit(function(event) {
         }
 
         // const screenshotPath = data.screenshotPath;
-        const imageData = data.imageData;
-
+        
         // addFiletreeItem(screenshotPath.replace(/\//g, '\\'), browser, imageData);
+        
+        // previousColumn ++;
+        // if (previousColumn > maxColumns) {
+            //     previousColumn = 0;
+            // }
+            
+            // const column = $("#resultArea > div").eq(previousColumn);
+            // col-xxl-2 col-xl-3 col-lg-4 col-sm-6
+            // data-item="${screenshotPath}" 
+            // href="data:image/png;base64,${imageData}" target="_blank"
 
-        previousColumn ++;
-        if (previousColumn > maxColumns) {
-            previousColumn = 0;
-        }
+        const imageData = data.imageData;
+        const pageUrl = data.pageUrl;
+        const pageTitle = data.pageTitle;
 
-        const column = $("#resultArea > div").eq(previousColumn);
-        // col-xxl-2 col-xl-3 col-lg-4 col-sm-6
-        // data-item="${screenshotPath}" 
-        // href="data:image/png;base64,${imageData}" target="_blank"
-        column.append(`
-            <div class="mb-4 w-100 position-relative" !important" >
-                <a href="#">
-                    <img src="data:image/png;base64,${imageData}" class="w-100 rounded border shadow" alt="image">
-                </a>
-            </div>
-        `);
+        createOrUpdateShelf(imageData, pageTitle, pageUrl);
+        updateFileTree(pageUrl);
+
+        // $("#resultArea").append(`
+        //     <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6">
+        //         <div class="mb-4 w-100 position-relative" !important" >
+        //             <a href="#">
+        //                 <img src="data:image/png;base64,${imageData}" class="w-100 rounded border shadow" alt="image">
+        //             </a>
+        //         </div>
+        //     </div>
+        // `);
+
         // <div class="position-absolute top-0 start-0 m-3">
         //             <div class="px-3 py-2 rounded bg-body-tertiary border bg-opacity-75 mb-3">
         //                 ${screenshotPath}
@@ -175,80 +185,215 @@ $("#searchForm").submit(function(event) {
     }
 });
 
-function addFiletreeItem(screenshotPath, browser, imageData) {
-    const pathParts = screenshotPath.split("\\").filter((part) => part !== "").splice(1);
+var shelves = [];
 
-    $("#taskToast .breadcrumb").html("");
+function createOrUpdateShelf(imageData, pageTitle, pageUrl) {
 
-    for (var i = 0; i < pathParts.length; i++) {
-        const path = pathParts.slice(0, i + 1).join("/");
-        const part = pathParts[i];
-
-        $("#taskToast .breadcrumb").append(`<li class="breadcrumb-item">${part}</li>`);
-
-        if ($(`li[data-path="${path}"]`).length !== 0) {
-            continue;
-        }
-
-        const type = i === pathParts.length - 1 ? "file" : "folder";
-        const safePath = path.replace(/[.\/]/g, '\\$&')
-        const parentPath = pathParts.slice(0, i).join("/");
-        const safeParentPath = parentPath.replace(/[.\/]/g, '\\$&');
-
-        const name = type === "file" ? part.replace(".png", "") : part
-
-        var item = {
-            name: name,
-            type: type,
-            path: path,
-            safePath: safePath,
-            children: [],
-            show: i === 0 ? "show" : "",
-            imageData: type === "file" ? imageData : null
-        }
-
-
-        var parent = $(`li[data-path="${safeParentPath}"]`).length > 0 ? $(`#collapse-${safeParentPath}`) : $("#filetree > ul").first();
-        showFiletreeItem(item, parent, browser)
+    const urlSchemeIndex = pageUrl.indexOf("://");
+    const scheme = pageUrl.split("://")[0] + "://";
+    if (urlSchemeIndex !== -1) {
+        var pageUrlWithoutScheme = pageUrl.slice(urlSchemeIndex + 3)
     }
-}
+    else {
+        var pageUrlWithoutScheme = pageUrl;
+    }
 
-function showFiletreeItem(item, parent, browser) {
-    if (item.type === "file") {
-        const itemElement = $(`
-            <li data-path="${item.path}" class="filetree-item file">
-                <a href="data:image/png;base64,${item.imageData}" target="_blank">
-                    <i class="bi bi-browser-${browser} me-1"></i>
-                    <span>${item.name}</span>
+    if (shelves.includes(pageUrl)) {
+        $(`.result-shelf[data-url="${pageUrl}"] > .result-images`).first().append(`
+            <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6 mb-4">
+                <img class="w-100 rounded shadow" src="data:image/png;base64,${imageData}" alt="">
+            </div>
+        `);
+        return;
+    }
+
+    const urlParts = pageUrlWithoutScheme.split("/");
+
+    var shelf = $(`
+        <div class="result-shelf mx-5" data-title="${pageTitle}" data-url="${pageUrl}">
+            <h4 id="${pageUrl}" class="pt-5">${pageTitle}</h4>
+            <ol class="breadcrumb text-body-secondary"></ol>
+            <div class="result-images row">
+                <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6 mb-4">
+                    <img class="w-100 rounded shadow" src="data:image/png;base64,${imageData}" alt="">
+                </div>
+            </div>
+        </div>
+    `);
+
+    
+    urlParts.forEach((part, index) => {
+        var urlPartsClone = urlParts.slice();
+        const urlSlice = urlPartsClone.splice(0, index + 1);
+        const href = scheme + urlSlice.join("/")
+        shelf.find(".breadcrumb").first().append(`
+            <li class="breadcrumb-item">
+                <a href="${href}" class="text-decoration-none text-reset" target="_blank">
+                    ${part}
                 </a>
             </li>
         `);
-        parent.prepend(itemElement); // prepend so files appear before folders
-    }
-    else if (item.type === "folder") {
-        const itemElement = $(`
-            <li data-path="${item.path}" class="filetree-item folder">
-                <div data-bs-toggle="collapse" data-bs-target="#collapse-${item.path}" role="button" class="collapsed">
-                    <i class="bi bi-chevron-right me-1"></i>
-                    <span>${item.name}</span>
-                </div>
-                <ul class="collapse" id="collapse-${item.path}"></ul>
-            </li>
-        `)
-        parent.append(itemElement);
+    });
 
-        // Change the chevron direction on showing collapse
-        itemElement.on("click", function(event) {
-            const icon = $(event.currentTarget).find(".bi").first();
-            const showing = $(event.currentTarget).find("div[data-bs-toggle='collapse']").first().hasClass("collapsed");
+    shelves.push(pageUrl);
+    $("#resultArea").append(shelf)
 
-            const transform = !showing ? "rotate(90deg)" : "";
-            icon.css("transform", transform);
-
-            event.stopPropagation();
-        });
-    }
 }
+
+function updateFileTree(pageUrl) {
+    const url = new URL(pageUrl);
+    const urlParts = (url.hostname + "/" + url.pathname).split("/").filter(part => part !== "");
+    var parent = $("#filetree > ul").first();
+
+    let currentPath = "";
+    urlParts.forEach((part, index) => {
+        var currentUrl = url.origin;
+        if (index !== 0) {
+            currentPath += "/" + part;
+            currentUrl = url.origin + currentPath
+        }
+        
+        console.log(currentUrl + "\n" + url);
+
+        // check if this part exists
+        existingItem = $(`#filetree li[data-url="${currentUrl}"]`);
+        if (existingItem.length) {
+
+            // console.log("currentUrl exists " + currentUrl);
+
+            // If we are at the end of the parts list
+            if (index === urlParts.length - 1) {
+                return;
+            }
+            parent = existingItem.find("ul").first();
+            existingDropButton = existingItem.find("button").first();
+            if (!existingDropButton.length) {
+                const buttonElement = $(`
+                    <button class="btn btn-sidebar collapsed" data-bs-toggle="collapse" data-bs-target="#collapse-${currentUrl}">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                `);
+                buttonElement.on("click", function(event) {
+                    const icon = $(event.currentTarget).find(".bi").first();
+                    const showing = $(event.currentTarget).hasClass("collapsed");
+                    const transform = !showing ? "rotate(90deg)" : "";
+                    icon.css("transform", transform);
+                    event.stopPropagation();
+                });
+                existingItem.find("div").first().prepend(buttonElement);
+            }
+        }
+        else {
+            newElement = $(`
+                <li data-url="${currentUrl}">
+                    <div class="btn-group shadow-sm mb-2">
+                        <a href="#${currentUrl}" class="btn btn-sidebar">
+                            ${part}
+                        </a>
+                    </div>
+                    <ul id="collapse-${currentUrl}" class="collapse">
+                    </ul>
+                </li>
+            `);
+            if (index !== urlParts.length - 1) {
+                const buttonElement = $(`
+                    <button class="btn btn-sidebar collapsed" data-bs-toggle="collapse" data-bs-target="#collapse-${currentUrl}">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                `);
+                buttonElement.on("click", function(event) {
+                    const icon = $(event.currentTarget).find(".bi").first();
+                    const showing = $(event.currentTarget).hasClass("collapsed");
+
+                    const transform = !showing ? "rotate(90deg)" : "";
+                    icon.css("transform", transform);
+
+                    event.stopPropagation();
+                });
+                newElement.find("div").first().prepend(buttonElement);
+            }
+
+            parent.append(newElement);
+            parent = newElement.find("ul").first();
+        }
+    });
+}
+
+
+// function addFiletreeItem(screenshotPath, browser, imageData) {
+//     const pathParts = screenshotPath.split("\\").filter((part) => part !== "").splice(1);
+
+//     $("#taskToast .breadcrumb").html("");
+
+//     for (var i = 0; i < pathParts.length; i++) {
+//         const path = pathParts.slice(0, i + 1).join("/");
+//         const part = pathParts[i];
+
+//         $("#taskToast .breadcrumb").append(`<li class="breadcrumb-item">${part}</li>`);
+
+//         if ($(`li[data-path="${path}"]`).length !== 0) {
+//             continue;
+//         }
+
+//         const type = i === pathParts.length - 1 ? "file" : "folder";
+//         const safePath = path.replace(/[.\/]/g, '\\$&')
+//         const parentPath = pathParts.slice(0, i).join("/");
+//         const safeParentPath = parentPath.replace(/[.\/]/g, '\\$&');
+
+//         const name = type === "file" ? part.replace(".png", "") : part
+
+//         var item = {
+//             name: name,
+//             type: type,
+//             path: path,
+//             safePath: safePath,
+//             children: [],
+//             show: i === 0 ? "show" : "",
+//             imageData: type === "file" ? imageData : null
+//         }
+
+
+//         var parent = $(`li[data-path="${safeParentPath}"]`).length > 0 ? $(`#collapse-${safeParentPath}`) : $("#filetree > ul").first();
+//         showFiletreeItem(item, parent, browser)
+//     }
+// }
+
+// function showFiletreeItem(item, parent, browser) {
+//     if (item.type === "file") {
+//         const itemElement = $(`
+//             <li data-path="${item.path}" class="filetree-item file">
+//                 <a href="data:image/png;base64,${item.imageData}" target="_blank">
+//                     <i class="bi bi-browser-${browser} me-1"></i>
+//                     <span>${item.name}</span>
+//                 </a>
+//             </li>
+//         `);
+//         parent.prepend(itemElement); // prepend so files appear before folders
+//     }
+//     else if (item.type === "folder") {
+//         const itemElement = $(`
+//             <li data-path="${item.path}" class="filetree-item folder">
+//                 <div data-bs-toggle="collapse" data-bs-target="#collapse-${item.path}" role="button" class="collapsed">
+//                     <i class="bi bi-chevron-right me-1"></i>
+//                     <span>${item.name}</span>
+//                 </div>
+//                 <ul class="collapse" id="collapse-${item.path}"></ul>
+//             </li>
+//         `)
+//         parent.append(itemElement);
+
+//         // Change the chevron direction on showing collapse
+//         itemElement.on("click", function(event) {
+//             const icon = $(event.currentTarget).find(".bi").first();
+//             const showing = $(event.currentTarget).find("div[data-bs-toggle='collapse']").first().hasClass("collapsed");
+
+//             const transform = !showing ? "rotate(90deg)" : "";
+//             icon.css("transform", transform);
+
+//             event.stopPropagation();
+//         });
+//     }
+// }
 
 $("#btnCollapseAll").on("click", function() {
 
@@ -257,7 +402,7 @@ $("#btnCollapseAll").on("click", function() {
         return;
     }
 
-    var $elements = $("#filetree li > div:not(.collapsed)").get().reverse()
+    var $elements = $("#filetree li > div > button:not(.collapsed)").get().reverse()
 
     $elements.forEach(function(element) {
         var $elem = $(element);
@@ -273,7 +418,7 @@ $("#btnExpandAll").on("click", function() {
         return;
     }
 
-    $("#filetree li > div.collapsed").each(function(index) {
+    $("#filetree li > div > button.collapsed").each(function(index) {
         var $elem = $(this);    
         $elem.removeClass("collapsed");
         $elem.click();

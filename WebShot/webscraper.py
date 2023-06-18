@@ -80,14 +80,14 @@ class WebScraper:
 
         async with semaphore:
 
-            # now = time.time()
             page = await self.browser.new_page(base_url=self.initial_url_str)
             await page.goto(url, timeout=30000, wait_until="domcontentloaded")
             await self.screenshot(page)
-            # print(f"screenshot {url} in {round(time.time() - now, 2)} seconds")
-            hrefs = [await anchor.get_attribute("href") for anchor in await page.query_selector_all("a[href]")]
+            hrefs = [
+                await anchor.get_attribute("href")
+                for anchor in await page.query_selector_all("a[href]")
+            ]
             await page.close(run_before_unload=True)
-            # print(f"done with {url} in {round(time.time() - now, 2)} seconds")
 
         asyncio.ensure_future(self.queue_hrefs(hrefs))
 
@@ -104,8 +104,10 @@ class WebScraper:
             encoded_data = base64.b64encode(image_data).decode("utf-8")
             encoded_data = encoded_data.replace("\n", "")
 
-            await self.screenshot_queue.put(encoded_data)
-            print("data has beed added to the screenshot queue")
+            title = await page.title()
+            data = (encoded_data, title, page.url)
+
+            await self.screenshot_queue.put(data)
 
     async def queue_hrefs(self, hrefs: list[str]):
         """
@@ -146,12 +148,12 @@ class WebScraper:
         Generator function. Yields from the screenshot queue.
         """
 
-        now = time.time()
-        print("waiting for screenshot...")
-        screenshot_data = await self.screenshot_queue.get()
-        print(f"screenshot obtained in {round(time.time() - now, 2)} seconds!")
+        screenshot_data, page_title, page_url = await self.screenshot_queue.get()
+
         yield {
             "imageData": str(screenshot_data),
+            "pageTitle": page_title,
+            "pageUrl": page_url,
             "complete": self.complete
         }
 
