@@ -149,10 +149,11 @@ $("#searchForm").submit(function(event) {
             // href="data:image/png;base64,${imageData}" target="_blank"
 
         const imageData = data.imageData;
+        const filePath = data.filepath;
         const pageUrl = data.pageUrl;
         const pageTitle = data.pageTitle;
 
-        createOrUpdateShelf(imageData, pageTitle, pageUrl);
+        createOrUpdateShelf(imageData, filePath, pageTitle, pageUrl);
         updateFileTree(pageUrl);
 
         // $("#resultArea").append(`
@@ -187,7 +188,16 @@ $("#searchForm").submit(function(event) {
 
 var shelves = [];
 
-function createOrUpdateShelf(imageData, pageTitle, pageUrl) {
+function createOrUpdateShelf(imageData, filePath, pageTitle, pageUrl) {
+
+    var imageSrc;
+    // console.log(pageUrl + " | " + imageData.length + " | " + filePath === null)
+    if (imageData.length && filePath === null) {
+        imageSrc = "data:image/png;base64," + imageData;
+    }
+    else {
+        imageSrc = filePath;
+    }
 
     const urlSchemeIndex = pageUrl.indexOf("://");
     const scheme = pageUrl.split("://")[0] + "://";
@@ -201,7 +211,7 @@ function createOrUpdateShelf(imageData, pageTitle, pageUrl) {
     if (shelves.includes(pageUrl)) {
         $(`.result-shelf[data-url="${pageUrl}"] > .result-images`).first().append(`
             <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6 mb-4">
-                <img class="w-100 rounded shadow" src="data:image/png;base64,${imageData}" alt="">
+                <img class="w-100 rounded shadow" src="${imageSrc}" alt="">
             </div>
         `);
         return;
@@ -215,7 +225,7 @@ function createOrUpdateShelf(imageData, pageTitle, pageUrl) {
             <ol class="breadcrumb text-body-secondary"></ol>
             <div class="result-images row">
                 <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6 mb-4">
-                    <img class="w-100 rounded shadow" src="data:image/png;base64,${imageData}" alt="">
+                    <img class="w-100 rounded shadow" src="${imageSrc}" alt="">
                 </div>
             </div>
         </div>

@@ -125,16 +125,22 @@ class WebScraper:
 
             await self.screenshot_queue.put(data)
 
-    async def make_filepath(self, url: str) -> str:
+    async def make_filepath(self, url: str, resolution:str) -> str:
         """
         Creates a filepath for a new image from the given url.
         """
 
-        output_path = "output/"
         parsed_url = url.split("://")[1]
         url_parts = parsed_url.split("/")
 
+        output_path = "output/"
+
         for part in url_parts:
+            output_path += part + "/"
+
+        Path(output_path).mkdir(parents=True, exist_ok=True)
+        return output_path + resolution + ".png"
+
 
 
 
@@ -177,10 +183,11 @@ class WebScraper:
         Generator function. Yields from the screenshot queue.
         """
 
-        screenshot_data, page_title, page_url = await self.screenshot_queue.get()
+        screenshot_data, filepath, page_title, page_url = await self.screenshot_queue.get()
 
         yield {
             "imageData": str(screenshot_data),
+            "filepath": filepath,
             "pageTitle": page_title,
             "pageUrl": page_url,
             "complete": self.complete
@@ -189,4 +196,4 @@ class WebScraper:
 
 if __name__ == "__main__":
     scraper = WebScraper("chrome", ("1920x1080", "1080x1920"), True, False)
-    asyncio.get_event_loop().run_until_complete(scraper.stream_content_generator("https://www.microsoft.com"))
+    asyncio.get_event_loop().run_until_complete(scraper.start("https://www.microsoft.com"))

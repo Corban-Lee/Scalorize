@@ -104,7 +104,10 @@ async def stream_screenshots():
 
     return response
 
-# TODO: old? should be removed ?
+import os
 @index_blueprint.route("/output/<path:filename>")
 async def serve_file(filename):
-    return send_file("../output/" + filename)
+    try:
+        return await send_file("output/" + filename)
+    except PermissionError as error:
+        pass
