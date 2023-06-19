@@ -2,17 +2,17 @@
 Web Scraper for the application.
 """
 
-import time
 import base64
 import asyncio
 from asyncio.queues import Queue
+from pathlib import Path
 from urllib.parse import urlparse, urljoin
-from playwright.async_api import async_playwright
+from playwright.async_api import async_playwright, Page
 
 
 class WebScraper:
     """
-    Scrapes content from the web. Data can be retrieved from the `get_screenshot_data` AsyncGenerator method.
+    Scrapes content from the web. Data can be retrieved from the `fetch_completed` method.
     """
 
     def __init__(self, browser_name: str, resolutions:tuple[str], fullscreen: bool, save_to_disk: bool, semaphore_limit: int):
@@ -28,9 +28,15 @@ class WebScraper:
         self.url_queue = Queue()
         self.screenshot_queue = Queue()
 
-    async def stream_content_generator(self, url: str):
+    async def start(self, url: str):
         """
-        Streams scraped content back to the application front end.
+        Starts scraping content from the given URL.
+        Content can be retrieved from the `fetch_completed` method.
+
+        Parameters
+        ----------
+        url : str
+            The base URL of the scraping process.
         """
 
         try:
@@ -55,10 +61,12 @@ class WebScraper:
 
                 while not self.url_queue.empty() or tasks:
                     print(f"queue size: {self.url_queue.qsize()} | tasks: {len(tasks)}")
-                    # Limit the maximum number of concurrent tasks
+
+                    # limit the maximum number of tasks
                     if len(tasks) >= self.semaphore_limit:
                         await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
                         tasks = [task for task in tasks if not task.done()]
+
                     else:
                         url = await self.url_queue.get()
                         self.visited_urls.add(url)
@@ -69,7 +77,8 @@ class WebScraper:
         except Exception as error:
             print(f"ERROR: {error.with_traceback()}")
 
-        print("completed tasks")
+        # When finished, set a flag and add None to the result queue.
+        # This ensures that the `fetch_completed` method doesn't hang.
         self.screenshot_queue.put(None)
         self.complete = True
 
@@ -91,7 +100,7 @@ class WebScraper:
 
         asyncio.ensure_future(self.queue_hrefs(hrefs))
 
-    async def screenshot(self, page):
+    async def screenshot(self, page: Page):
         """
         Take a screenshot of the page and add the image data to the screenshot queue.
         """
@@ -100,14 +109,34 @@ class WebScraper:
             width, height = map(int, resolution.split("x"))
             await page.set_viewport_size({"width": width, "height": height})
 
-            image_data = await page.screenshot(full_page=self.fullscreen)
-            encoded_data = base64.b64encode(image_data).decode("utf-8")
-            encoded_data = encoded_data.replace("\n", "")
+            if self.save_to_disk:
+                filepath = await self.make_filepath(page.url, resolution)
+                await page.screenshot(full_page=self.fullscreen, path=filepath)
+                encoded_data = None
+
+            else:
+                image_data = await page.screenshot(full_page=self.fullscreen)
+                encoded_data = base64.b64encode(image_data).decode("utf-8")
+                encoded_data = encoded_data.replace("\n", "")
+                filepath = None
 
             title = await page.title()
-            data = (encoded_data, title, page.url)
+            data = (encoded_data, filepath, title, page.url)
 
             await self.screenshot_queue.put(data)
+
+    async def make_filepath(self, url: str) -> str:
+        """
+        Creates a filepath for a new image from the given url.
+        """
+
+        output_path = "output/"
+        parsed_url = url.split("://")[1]
+        url_parts = parsed_url.split("/")
+
+        for part in url_parts:
+
+
 
     async def queue_hrefs(self, hrefs: list[str]):
         """
@@ -143,7 +172,7 @@ class WebScraper:
         else:
             return urljoin(self.initial_url_str, href)
 
-    async def get_next_screenshot(self):
+    async def fetch_completed(self):
         """
         Generator function. Yields from the screenshot queue.
         """
