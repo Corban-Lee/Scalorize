@@ -249,8 +249,8 @@ function updateFileTree(pageUrl) {
     urlParts.forEach((part, index) => {
         var currentUrl = url.origin;
         if (index !== 0) {
-            currentPath += "/" + part;
-            currentUrl = url.origin + currentPath
+            currentPath += part + "/";
+            currentUrl = url.origin + "/" + currentPath
         }
         
         console.log(currentUrl + "\n" + url);
