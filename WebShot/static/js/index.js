@@ -172,7 +172,7 @@ function createOrUpdateShelf(imageData, filePath, pageTitle, pageUrl) {
     }
 
     if (shelves.includes(pageUrl)) {
-        $(`.result-shelf[data-url="${pageUrl}"] > .result-images`).first().append(`
+        $(`.result-shelf[data-url="${pageUrl}"] .result-images`).first().append(`
             <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6 mb-4">
                 <img class="w-100 rounded shadow" src="${imageSrc}" alt="">
             </div>
@@ -183,12 +183,19 @@ function createOrUpdateShelf(imageData, filePath, pageTitle, pageUrl) {
     const urlParts = pageUrlWithoutScheme.split("/");
 
     var shelf = $(`
-        <div class="result-shelf mx-5" data-title="${pageTitle}" data-url="${pageUrl}">
-            <h4 id="${pageUrl}" class="pt-5">${pageTitle}</h4>
-            <ol class="breadcrumb text-body-secondary"></ol>
-            <div class="result-images row">
-                <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6 mb-4">
-                    <img class="w-100 rounded shadow" src="${imageSrc}" alt="">
+        <div id="${pageUrl}" class="result-shelf mx-5 d-flex pt-5" data-url="${pageUrl}">
+            <div class="d-inline-block me-3">
+                <a href="${pageUrl}" target="_blank" class="text-secondary fs-6">
+                    <i class="bi bi-box-arrow-up-left"></i>
+                </a>
+            </div>
+            <div class="d-inline-block">
+                <h4 >${pageTitle}</h4>
+                <ol class="breadcrumb text-body-secondary"></ol>
+                <div class="result-images row">
+                    <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6 mb-4">
+                        <img class="w-100 rounded shadow" src="${imageSrc}" alt="">
+                    </div>
                 </div>
             </div>
         </div>
