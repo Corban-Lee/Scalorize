@@ -71,7 +71,7 @@ $("#searchForm").submit(function(event) {
     const fullScreenshot = $("#option-fullScreenshot").prop("checked");
     eventSourceUrl += `&fullscreen=${fullScreenshot}`;
 
-    const saveToDisk = $("#option-saveToDisk").prop("checked");
+    const saveToDisk = $("#option-saveToDisk").prop("checked") === false;
     eventSourceUrl += `&saveToDisk=${saveToDisk}`;
 
     const semaphoreLimit = $("#option-semaphoreLimit").val();
