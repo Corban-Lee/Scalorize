@@ -11,12 +11,14 @@ from quart import (
     request,
     send_file,
     Response,
-    make_response
+    make_response,
+    current_app
 )
 
 from webscraper import WebScraper
 
 index_blueprint = Blueprint("index", __name__)
+scraper = None
 
 @index_blueprint.route("/")
 async def index() -> str:
@@ -63,6 +65,7 @@ async def capture_generator(
     str
         The data as a json string. Should be returned to the client side.
     """
+    global scraper
 
     # Initialize the web scraper and start scraping.
     scraper = WebScraper(browser, resolutions, fullscreen, save_to_disk, semaphore_limit)
@@ -70,13 +73,14 @@ async def capture_generator(
 
     # Keep listening for new data.
     while True:
-        screenshot_data = scraper.fetch_completed()
-        async for data in screenshot_data:
-            if data.get("complete", False):
-                break
+        data = await scraper.fetch_completed()
 
-            data = f"data:{json.dumps(data)}\n\n"
-            yield data
+        string_data = f"data:{json.dumps(data)}\n\n"
+        yield string_data
+
+        if data.get("complete", False):
+            print("test")
+            break
 
 @index_blueprint.route("/stream-screenshots")
 async def stream_screenshots():
@@ -104,10 +108,18 @@ async def stream_screenshots():
 
     return response
 
-import os
+@index_blueprint.route("/kill-stream")
+async def kill_stream():
+    """
+    """
+
+    scraper.complete = True
+
+    return ""
+
 @index_blueprint.route("/output/<path:filename>")
 async def serve_file(filename):
     try:
         return await send_file("output/" + filename)
     except PermissionError as error:
-        pass
+        print(error)

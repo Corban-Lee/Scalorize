@@ -125,8 +125,7 @@ $("#searchForm").submit(function(event) {
     eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data)
 
-        if (data.complete === "true") {
-            alert("complete");
+        if (data.complete) {
             cleanup();
             return;
         }

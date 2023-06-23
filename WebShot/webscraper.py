@@ -59,18 +59,35 @@ class WebScraper:
                 tasks = []
                 semaphore = asyncio.Semaphore(self.semaphore_limit)
 
-                while not self.url_queue.empty() or tasks:
+                # while (not self.url_queue.empty() or tasks) and not self.complete:
+                #     print(f"queue size: {self.url_queue.qsize()} | tasks: {len(tasks)}")
+
+                #     # limit the maximum number of tasks
+                #     if len(tasks) >= self.semaphore_limit:
+                #         await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+                #         tasks = [task for task in tasks if not task.done()]
+
+                #     elif not self.url_queue.empty():
+                #         url = await self.url_queue.get()
+                #         self.visited_urls.add(url)
+                #         tasks.append(asyncio.create_task(self.process_url(url, semaphore)))
+                # else:
+                #     print("completed while loop")
+
+                while not self.complete:
                     print(f"queue size: {self.url_queue.qsize()} | tasks: {len(tasks)}")
 
-                    # limit the maximum number of tasks
                     if len(tasks) >= self.semaphore_limit:
                         await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
                         tasks = [task for task in tasks if not task.done()]
 
-                    else:
+                    elif not self.url_queue.empty():
                         url = await self.url_queue.get()
                         self.visited_urls.add(url)
                         tasks.append(asyncio.create_task(self.process_url(url, semaphore)))
+
+                    else:
+                        break
 
                 await asyncio.gather(*tasks)
 
@@ -79,8 +96,8 @@ class WebScraper:
 
         # When finished, set a flag and add None to the result queue.
         # This ensures that the `fetch_completed` method doesn't hang.
-        self.screenshot_queue.put(None)
         self.complete = True
+        await self.screenshot_queue.put((None, None, None, None))
 
     async def process_url(self, url: str, semaphore: asyncio.Semaphore):
         """
@@ -141,9 +158,6 @@ class WebScraper:
         Path(output_path).mkdir(parents=True, exist_ok=True)
         return output_path + resolution + ".png"
 
-
-
-
     async def queue_hrefs(self, hrefs: list[str]):
         """
         Queue up the href content found on the given page.
@@ -180,12 +194,16 @@ class WebScraper:
 
     async def fetch_completed(self):
         """
-        Generator function. Yields from the screenshot queue.
+        Returns completed items from the screenshot queue.
         """
 
-        screenshot_data, filepath, page_title, page_url = await self.screenshot_queue.get()
+        data = await self.screenshot_queue.get()
+        if not data:
+            return {"complete": self.complete}
 
-        yield {
+        screenshot_data, filepath, page_title, page_url = data
+
+        return {
             "imageData": str(screenshot_data),
             "filepath": filepath,
             "pageTitle": page_title,
