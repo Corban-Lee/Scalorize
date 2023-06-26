@@ -261,14 +261,16 @@ function updateFileTree(pageUrl) {
             }
         }
         else {
+            paddingClass = !usingListView ? "ps-3" : "ps-0";
+
             newElement = $(`
-                <li data-url="${currentUrl}">
-                    <div class="btn-group shadow-sm mb-2">
+                 <li class="filetree-item" data-url="${currentUrl}">
+                    <div class="btn-group shadow-sm mb-3">
                         <a href="#${currentUrl}" class="btn btn-sidebar">
                             ${part}
                         </a>
                     </div>
-                    <ul id="collapse-${currentUrl}" class="collapse">
+                    <ul id="collapse-${currentUrl}" class="collapse ${paddingClass}">
                     </ul>
                 </li>
             `);
@@ -296,20 +298,58 @@ function updateFileTree(pageUrl) {
     });
 }
 
-$("#btnCollapseAll").on("click", function() {
+var usingListView = false;
 
-    if (!$("#filetree ul").first().html()) {
-        alert("There are no files to collapse");
-        return;
+$("#btnListView").on("click", function() {
+
+    if (usingListView) {
+        $(".filetree-item ul").removeClass("ps-0").addClass("ps-3");
+        $(this).find(".bi").first().removeClass("bi-list-nested").addClass("bi-list");
+    }
+    else {
+        $(".filetree-item ul").addClass("ps-0").removeClass("ps-3");
+        $(this).find(".bi").first().addClass("bi-list-nested").removeClass("bi-list");
     }
 
-    var $elements = $("#filetree li > div > button:not(.collapsed)").get().reverse()
+    usingListView = !usingListView;
 
-    $elements.forEach(function(element) {
-        var $elem = $(element);
-        $elem.addClass("collapsed");
-        $elem.click();
-    });
+});
+
+var collapsedAll = true;
+
+$("#btnCollapseAll").on("click", function() {
+
+    if (!collapsedAll) {
+        if (!$("#filetree ul").first().html()) {
+            alert("There are no files to collapse");
+            return;
+        }
+        
+        $(this).find(".bi").first().removeClass("bi-chevron-double-up").addClass("bi-chevron-double-down");
+        var $elements = $("#filetree li > div > button:not(.collapsed)").get().reverse();
+    
+        $elements.forEach(function(element) {
+            var $elem = $(element);
+            $elem.addClass("collapsed");
+            $elem.click();
+        });
+    }
+    else {
+        if (!$("#filetree ul").first().html()) {
+            alert("There are no files to expand");
+            return;
+        }
+    
+        $(this).find(".bi").first().addClass("bi-chevron-double-up").removeClass("bi-chevron-double-down");
+        $("#filetree li > div > button.collapsed").each(function(index) {
+            var $elem = $(this);    
+            $elem.removeClass("collapsed");
+            $elem.click();
+        });
+    }
+
+    collapsedAll = !collapsedAll;
+
 });
   
 $("#btnExpandAll").on("click", function() {

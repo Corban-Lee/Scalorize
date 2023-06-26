@@ -193,3 +193,7 @@ input[type=number] {
 #resolutionOptions > .form-check:hover .resolution-erase {
     display: block !important;
 }
+
+.btn-sidebar:hover {
+    color: var(--bs-emphasis-color);
+}
