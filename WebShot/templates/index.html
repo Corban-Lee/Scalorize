@@ -12,14 +12,16 @@
 </head>
 <body>
     <div id="root">
-        <div class="p-4 bg-body-tertiary shadow overflow-auto" id="sidebar">
+        <div class="bg-body-tertiary shadow overflow-auto" id="sidebar">
 
             <!-- Branding -->
-            <a href="/" id="brand" class="w-100 mb-4 pb-0 text-center">
-                <img src="{{ url_for('static', filename='images/logo-text.png') }}" alt="product logo" height="45">
-            </a>
+            <div class="bg-body-secondary shadow-sm text-center mb-3 px-4 py-3">
+                <a href="/" id="brand" class="w-100">
+                    <img src="{{ url_for('static', filename='images/logo-text.png') }}" alt="product logo" height="45">
+                </a>
+            </div>
 
-            <form id="searchForm">
+            <form id="searchForm" class="p-4 pb-0">
                 <div class="input-group mb-4 shadow-sm rounded">
                     <input class="form-control border-0" type="search" name="search" id="search" placeholder="https://example.com">
                     <button type="submit" class="btn btn-sidebar rounded-start-0" id="searchBtn">
@@ -35,9 +37,11 @@
                             <i class="bi bi-gear"></i>
                         </button>
                     </div>
-                    <div class="d-flex mb-4">
-                        <!-- btnExpandAll -->
-                        <button type="button" id="btnListView" class="btn btn-sidebar shadow-sm me-3">
+                    <div class="d-flex mb-4 btn-group">
+                        <button type="button" id="btnSortFiletree" class="btn btn-sidebar shadow-sm">
+                            <i class="bi bi-sort-alpha-up"></i>
+                        </button>
+                        <button type="button" id="btnListView" class="btn btn-sidebar shadow-sm">
                             <i class="bi bi-list"></i>
                         </button>
                         <button type="button" id="btnCollapseAll" class="btn btn-sidebar shadow-sm">
@@ -48,8 +52,8 @@
             </form>
 
             <!-- Drivers Dropdown -->
-            <div id="searchOptions" class="collapse">
-                <div id="driversOptions" class="sidebar-container overflow-auto mb-3 w-100 px-2 pt-4 pb-3">
+            <div id="searchOptions" class="collapse p-4 pt-2">
+                <div id="driversOptions" class="sidebar-container overflow-auto w-100 px-2 pb-3">
 
                     <h3 class="h5 mb-4 d-flex justify-content-between">
                         <span class="small">
@@ -99,15 +103,18 @@
             </div>
 
             <!-- Filetree -->
-            <div id="filetree" class="pb-3">
+            <div id="filetree" class="p-4 pt-0">
                 <ul class="pe-3"></ul>
             </div>
         </div>
 
         <!-- Image Results Area -->
-        <div class="d-flex flex-grow-1 flex-column overflow-y-auto p-4 pt-0" style="scroll-behavior: smooth;">
+        <div class="d-flex flex-grow-1 flex-column overflow-y-auto position-relative" style="scroll-behavior: smooth;">
 
-            <div id="resultArea" class="w-100">
+            <div class="w-100 bg-body-tertiary p-4 shadow-sm position-sticky sticky-top" style="min-height: 77px">
+            </div>
+
+            <div id="resultArea" class="w-100 p-4 pt-0">
             </div>
 
         </div>
