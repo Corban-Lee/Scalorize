@@ -79,7 +79,7 @@ async def capture_generator(
         yield string_data
 
         if data.get("complete", False):
-            print("test")
+            print("complete")
             break
 
 @index_blueprint.route("/stream-screenshots")

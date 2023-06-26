@@ -28,6 +28,13 @@ class WebScraper:
         self.url_queue = Queue()
         self.screenshot_queue = Queue()
 
+    async def get_next_url(self) -> str:
+        """
+
+        """
+
+        return await self.url_queue.get()
+
     async def start(self, url: str):
         """
         Starts scraping content from the given URL.
@@ -39,60 +46,53 @@ class WebScraper:
             The base URL of the scraping process.
         """
 
-        try:
+        await self.url_queue.put(url)
+        self.initial_url = urlparse(url)
+        self.initial_url_str = url
 
-            await self.url_queue.put(url)
-            self.initial_url = urlparse(url)
-            self.initial_url_str = url
 
-            async with async_playwright() as playwright:
-                browser_options = {
-                    "chrome": playwright.chromium,
-                    "edge": playwright.chromium,
-                    "firefox": playwright.firefox,
-                    "safari": playwright.webkit
-                }
+        async with async_playwright() as playwright:
+            browser_options = {
+                "chrome": playwright.chromium,
+                "edge": playwright.chromium,
+                "firefox": playwright.firefox,
+                "safari": playwright.webkit
+            }
 
-                browser = await browser_options[self.browser_name].launch()
-                self.browser = browser
+            browser = await browser_options[self.browser_name].launch()
+            self.browser = browser
 
-                tasks = []
-                semaphore = asyncio.Semaphore(self.semaphore_limit)
+            tasks = []
+            semaphore = asyncio.Semaphore(self.semaphore_limit)
 
-                # while (not self.url_queue.empty() or tasks) and not self.complete:
-                #     print(f"queue size: {self.url_queue.qsize()} | tasks: {len(tasks)}")
+            while not self.complete:
+                print(f"queue size: {self.url_queue.qsize()} | tasks: {len(tasks)}")
 
-                #     # limit the maximum number of tasks
-                #     if len(tasks) >= self.semaphore_limit:
-                #         await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
-                #         tasks = [task for task in tasks if not task.done()]
+                tasks = [task for task in tasks if not task.done()]
 
-                #     elif not self.url_queue.empty():
-                #         url = await self.url_queue.get()
-                #         self.visited_urls.add(url)
-                #         tasks.append(asyncio.create_task(self.process_url(url, semaphore)))
-                # else:
-                #     print("completed while loop")
+                # Wait until there is room for another task
+                if len(tasks) >= self.semaphore_limit:
+                    await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
 
-                while not self.complete:
-                    print(f"queue size: {self.url_queue.qsize()} | tasks: {len(tasks)}")
 
-                    if len(tasks) >= self.semaphore_limit:
-                        await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
-                        tasks = [task for task in tasks if not task.done()]
+                # Queue up another task
+                elif tasks or not self.url_queue.empty():
+                    try:
+                        url = await asyncio.wait_for(self.get_next_url(), timeout=5)
+                    except TimeoutError:
+                        continue
+                    self.visited_urls.add(url)
+                    tasks.append(asyncio.create_task(self.process_url(url, semaphore)))
 
-                    elif not self.url_queue.empty():
-                        url = await self.url_queue.get()
-                        self.visited_urls.add(url)
-                        tasks.append(asyncio.create_task(self.process_url(url, semaphore)))
+                else:
+                    break
 
-                    else:
-                        break
+                # TODO:
+                # Write condition in which processing is 'done' and break out of the loop
+                # elif not tasks and self.url_queue.empty():  # infinite loop
+                #     break
 
-                await asyncio.gather(*tasks)
-
-        except Exception as error:
-            print(f"ERROR: {error.with_traceback()}")
+            await asyncio.gather(*tasks)
 
         # When finished, set a flag and add None to the result queue.
         # This ensures that the `fetch_completed` method doesn't hang.
