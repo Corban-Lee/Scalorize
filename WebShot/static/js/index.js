@@ -452,3 +452,7 @@ $("#addResolutionForm").on("submit", function(event) {
 
     addResolution(width, height);
 });
+
+$(".dropdown-menu").click(function(e){
+    e.stopPropagation();
+ })

@@ -141,6 +141,15 @@ body {
     opacity: inherit !important;
 }
 
+.resolution-item {
+    background-color: var(--bs-body-bg) !important;
+    border: none !important;
+}
+
+.resolution-item:hover {
+    background-color: rgba(var(--bs-secondary-bg-rgb), 0.3) !important;
+}
+
 .sidebar-container {
     /* background-color: var(--bs-body-bg) !important; */
 }
