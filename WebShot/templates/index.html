@@ -15,12 +15,13 @@
         <div class="bg-body-tertiary shadow overflow-auto" id="sidebar">
 
             <!-- Branding -->
-            <div class="bg-body-secondary shadow-sm text-center mb-3 px-4 py-3">
+             <div class="bg-body-secondary shadow-sm text-center mb-3 px-4 py-3">
                 <a href="/" id="brand" class="w-100">
                     <img src="{{ url_for('static', filename='images/logo-text.png') }}" alt="product logo" height="45">
                 </a>
             </div>
 
+            <!--
             <form id="searchForm" class="p-4 pb-0">
                 <div class="input-group mb-4 shadow-sm rounded">
                     <input class="form-control border-0" type="search" name="search" id="search" placeholder="https://example.com">
@@ -51,7 +52,6 @@
                 </div>
             </form>
 
-            <!-- Drivers Dropdown -->
             <div id="searchOptions" class="collapse p-4 pt-2">
                 <div id="driversOptions" class="sidebar-container overflow-auto w-100 px-2 pb-3">
 
@@ -100,7 +100,7 @@
                         Add Resolution
                     </button>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Filetree -->
             <div id="filetree" class="p-4 pt-0">
@@ -113,84 +113,166 @@
 
             <div class="w-100 bg-body-tertiary px-4 d-flex align-items-center shadow-sm position-sticky sticky-top" style="min-height: 77px">
                 
-                <div class="btn-group shadow-sm me-3">
-                    <div class="dropdown">
-                        <button id="btnScreenSizes" class="dropdown-toggle btn btn-sidebar rounded-end-0" data-bs-toggle="dropdown">
-                            <i class="bi bi-arrows-angle-expand me-1"></i>
-                        </button>
-                        <div id="screenSizesDropdown" class="dropdown-menu shadow-lg mt-3 border-0 p-0 rounded overflow-hidden" style="min-width: 275px">
-                            <div class="resolution-item d-flex justify-content-between align-items-center">
-                                <button class="btn px-3 py-2 rounded-0">
-                                    <input type="checkbox" class="form-check-input">
-                                </button>
-                                <label for="" class="px-3 py-2">
-                                    1920
-                                    <i class="bi bi-x"></i>
-                                    1080
-                                </label>
-                                <button class="btn px-3 py-2 rounded-0">
-                                    <i class="bi-pc-display-horizontal"></i>
-                                </button>
-                            </div>
-                            <div class="resolution-item d-flex justify-content-between align-items-center">
-                                <button class="btn px-3 py-2 rounded-0">
-                                    <input type="checkbox" class="form-check-input">
-                                </button>
-                                <label for="" class="px-3 py-2">
-                                    &nbsp;&nbsp;720
-                                    <i class="bi bi-x"></i>
-                                    1280
-                                </label>
-                                <button class="btn px-3 py-2 rounded-0">
-                                    <i class="bi-phone"></i>
-                                </button>
-                            </div>
-                            <div class="resolution-item d-flex justify-content-between align-items-center">
-                                <button class="btn px-3 py-2 rounded-0">
-                                    <input type="checkbox" class="form-check-input">
-                                </button>
-                                <label for="" class="px-3 py-2">
-                                    1920
-                                    <i class="bi bi-x"></i>
-                                    1080
-                                </label>
-                                <button class="btn px-3 py-2 rounded-0">
-                                    <i class="bi-trash3"></i>
-                                </button>
-                            </div>
-                            <hr class="text-body-tertiary my-2">
-                            <div class="btn-group w-100">
-                                <button class="resolution-item w-50 px-3 py-2 text-body rounded-end rounded-bottom-0">
-                                    New
-                                </button>
-                                <button class="resolution-item w-50 px-3 py-2 text-body rounded-top rounded-end-0">
-                                    Sort
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="dropdown">
-                        <button id="btnWebDrivers" class="dropdown-toggle btn btn-sidebar rounded-start-0" data-bs-toggle="dropdown">
-                            <i class="bi bi-browser-chrome me-1"></i>
-                        </button>
-                        <div id="webDriversDropdown" class="dropdown-menu">
-                            test
-                        </div>
-                    </div>
-                </div>
+                <div class="dropdown">
+                    <button id="btnScreenSizes" class="btn btn-sidebar shadow-sm me-3" data-bs-toggle="dropdown">
+                        <i class="bi bi-sliders2"></i>
+                    </button>
+                    <ul id="resolutionDropdown" class="dropdown-menu shadow-lg py-2 mt-3 rounded">
 
+                        <li class="dropdown-item resolution-item">
+                            <button class="btn">
+                                <input id="resolution_1920x1080" type="checkbox" class="form-check-input">
+                            </button>
+                            <label for="resolution_1920x1080">
+                                1920
+                                <i class="bi bi-x"></i>
+                                1080
+                            </label>
+                            <button class="btn">
+                                <i class="bi bi-pc-display-horizontal"></i>
+                            </button>
+                        </li>
+                        
+                        <li class="dropdown-item resolution-item">
+                            <button class="btn">
+                                <input id="resolution_1080x1920" type="checkbox" class="form-check-input">
+                            </button>
+                            <label for="resolution_1080x1920">
+                                1080
+                                <i class="bi bi-x"></i>
+                                1920
+                            </label>
+                            <button class="btn">
+                                <i class="bi bi-phone"></i>
+                            </button>
+                        </li>
+
+                        <li class="dropdown-item resolution-item">
+                            <button class="btn">
+                                <input id="resolution_720x1080" type="checkbox" class="form-check-input">
+                            </button>
+                            <label for="resolution_720x1080">
+                                &nbsp;&nbsp;720
+                                <i class="bi bi-x"></i>
+                                1280
+                            </label>
+                            <button class="btn">
+                                <i class="bi bi-phone"></i>
+                            </button>
+                        </li>
+
+                        <hr class="text-body-tertiary my-2">
+                        <div class="btn-group w-100">
+                            <button class="resolution-item w-50 px-3 py-2 text-body rounded-end justify-content-center">
+                                New
+                            </button>
+                            <button class="resolution-item w-50 px-3 py-2 text-body rounded-start justify-content-center">
+                                Sort
+                            </button>
+                        </div>
+                    </ul>
+                </div>
                 
                 <div class="input-group shadow-sm rounded me-3">
-                    <input type="search" class="form-control border-0" placeholder="https://example.com">
+                    <div class="dropdown">
+                        <button id="btnWebDrivers" class="dropdown-toggle btn btn-sidebar rounded-end-0" data-bs-toggle="dropdown">
+                            <i class="bi bi-browser-firefox me-1"></i>
+                        </button>
+                        <ul id="webDriversDropdown" class="dropdown-menu shadow-lg py-2 mt-3 rounded">
+
+                            <li class="dropdown-item resolution-item">
+                                <button class="btn">
+                                    <input type="radio" name="webdriver" id="driver_chrome" class="form-check-input">
+                                </button>
+                                <label for="driver_chrome">
+                                    Chrome
+                                </label>
+                                <button class="btn">
+                                    <i class="bi bi-browser-chrome"></i>
+                                </button>
+                            </li>
+
+                            <li class="dropdown-item resolution-item">
+                                <button class="btn">
+                                    <input type="radio" name="webdriver" id="driver_firefox" class="form-check-input">
+                                </button>
+                                <label for="driver_firefox">
+                                    Firefox
+                                </label>
+                                <button class="btn">
+                                    <i class="bi bi-browser-firefox"></i>
+                                </button>
+                            </li>
+
+                            <li class="dropdown-item resolution-item">
+                                <button class="btn">
+                                    <input type="radio" name="webdriver" id="driver_safari" class="form-check-input">
+                                </button>
+                                <label for="driver_safari">
+                                    Safari
+                                </label>
+                                <button class="btn">
+                                    <i class="bi bi-browser-safari"></i>
+                                </button>
+                            </li>
+
+                        </ul>
+                    </div>
+
+                    <input type="search" class="form-control border-0" placeholder="Enter a web address here, then press 'enter' or the search button to get started">
                     <button class="btn btn-sidebar">
                         <i class="bi bi-search"></i>
                     </button>
                 </div>
 
-                <button class="btn btn-sidebar shadow-sm" data-bs-toggle="modal" data-bs-target="#optionsModal">
+                <button class="btn btn-sidebar shadow-sm me-3" data-bs-toggle="modal" data-bs-target="#optionsModal">
                     <i class="bi bi-gear"></i>
                 </button>
+
+                <div class="dropdown">
+                    <button class="btn btn-sidebar dropdown-toggle shadow-sm" data-bs-toggle="dropdown">
+                        <i class="bi bi-moon-stars me-1"></i>
+                    </button>                
+                    <ul id="themesDropdown" class="dropdown-menu shadow-lg py-2 mt-3 rounded">
+
+                        <li class="dropdown-item resolution-item">
+                            <button class="btn">
+                                <input type="radio" name="colourTheme" id="theme_light" class="form-check-input">
+                            </button>
+                            <label for="theme_light">
+                                Light
+                            </label>
+                            <button class="btn">
+                                <i class="bi bi-sun"></i>
+                            </button>
+                        </li>
+
+                        <li class="dropdown-item resolution-item">
+                            <button class="btn">
+                                <input type="radio" name="colourTheme" id="theme_dark" class="form-check-input">
+                            </button>
+                            <label for="theme_dark">
+                                Dark
+                            </label>
+                            <button class="btn">
+                                <i class="bi bi-moon-stars"></i>
+                            </button>
+                        </li>
+
+                        <li class="dropdown-item resolution-item">
+                            <button class="btn">
+                                <input type="radio" name="colourTheme" id="theme_auto" class="form-check-input">
+                            </button>
+                            <label for="theme_auto">
+                                Auto
+                            </label>
+                            <button class="btn">
+                                <i class="bi bi-window"></i>
+                            </button>
+                        </li>
+
+                    </ul>
+                </div>
             </div>
 
             <div id="resultArea" class="w-100 p-4 pt-0">

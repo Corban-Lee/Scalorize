@@ -141,15 +141,6 @@ body {
     opacity: inherit !important;
 }
 
-.resolution-item {
-    background-color: var(--bs-body-bg) !important;
-    border: none !important;
-}
-
-.resolution-item:hover {
-    background-color: rgba(var(--bs-secondary-bg-rgb), 0.3) !important;
-}
-
 .sidebar-container {
     /* background-color: var(--bs-body-bg) !important; */
 }
@@ -205,4 +196,37 @@ input[type=number] {
 
 .btn-sidebar:hover {
     color: var(--bs-emphasis-color);
+}
+
+
+#resolutionDropdown, #webDriversDropdown, #themesDropdown {
+    padding: 0;
+    border: none;
+    min-width: 275px;
+    overflow: hidden
+}
+
+#themesDropdown {
+    min-width: 220px;
+}
+
+.resolution-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    color: var(--bs-body-color) !important;
+    background-color: var(--bs-body-bg);
+    border: none;
+    cursor: pointer;
+}
+
+.resolution-item:hover {
+    background-color: rgba(var(--bs-secondary-bg-rgb), 0.3);
+}
+
+.resolution-item > * {
+    padding: .5rem 1rem .5rem 1rem;
+    border: 0;
+    cursor: pointer;
 }
