@@ -207,7 +207,7 @@ input[type=number] {
 }
 
 #themesDropdown {
-    min-width: 220px;
+    min-width: 175px;
 }
 
 .resolution-item {
@@ -219,6 +219,11 @@ input[type=number] {
     background-color: var(--bs-body-bg);
     border: none;
     cursor: pointer;
+}
+
+.accented:hover {
+    color: var(--bs-light) !important;
+    background-color: rgba(var(--bs-primary-rgb), 0.7) !important;
 }
 
 .resolution-item:hover {

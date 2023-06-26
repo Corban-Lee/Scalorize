@@ -80,3 +80,17 @@ $(document).ready(function() {
 $("#option-allowForeignDomains").on("click", function() {
     localStorage.setItem("option-allowForeignDomains", $(this).prop("checked") === false);
 });
+
+
+/**
+ * Resolutions
+ */
+
+$("#openNewResolutionCollapse").on("click", function() {
+    if ($(this).hasClass("collapsed")) {
+        $(this).text("New");
+    }
+    else {
+        $(this).text("Collapse");
+    }
+});

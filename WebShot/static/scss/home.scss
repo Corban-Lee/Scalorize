@@ -1,0 +1,202 @@
+
+@font-face {
+    font-family: "Helios";
+    src: url("/static/fonts/Helios-Light.ttf");
+}
+
+@font-face {
+    font-family: "JetBrains Mono";
+    src: url("/static/fonts/JetBrainsMono-Light.ttf");
+}
+
+.monospace {
+    font-family: "JetBrains Mono" !important;
+}
+
+body {
+    font-family: "Helios";
+    min-height: 100vh;
+    max-height: 100vh;
+}
+
+#root {
+    display: flex;
+    flex-wrap: nowrap;
+    align-content: start;
+    overflow: auto;
+    height: 100vh;
+    max-height: 100vh;
+
+    @media (max-width: 768px) {
+        flex-wrap: wrap;
+        flex-direction: row;
+    }
+}
+
+#sidebar {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    width: 300px;
+
+    @media (max-width: 768px) {
+        width: 100%;
+        height: fit-content;
+    }
+}
+
+#filetree {
+    overflow: auto !important;
+
+    ul {
+        list-style-type: none;
+        overflow-x: visible;
+        width: fit-content;
+
+        > li {
+            overflow-x: visible;
+            width: fit-content;
+
+            > div {
+                display: flex;
+                white-space: nowrap;
+                width: fit-content;
+
+                > button > i.bi {
+                    display: inline-block;
+                    transition: transform 0.3s ease;
+                }
+            }
+        }
+    }
+
+    > ul {
+        display: flex;
+        flex-direction: column;
+        width: fit-content;
+        margin-bottom: auto;
+        overflow: visible;
+        margin: 0;
+        padding: 0;
+    }
+}
+
+.no-text-highlight {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+}
+
+.btn-modal {
+    background-color: var(--bs-secondary-bg) !important;
+}
+
+.btn-sidebar {
+    background-color: var(--bs-body-bg) !important;
+    border: none !important;
+
+    .dropdown-toggle:not(.collapsed) {
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+    }
+
+    &:not(:disabled):hover {
+        background-color: rgba(var(--bs-secondary-bg-rgb), 0.3) !important;
+    }
+
+    &:disabled {
+        background-color: var(--bs-secondary-bg) !important;
+        opacity: inherit !important;
+    }
+}
+
+#resolutionOptions {
+
+    > .form-check {
+
+        > button.deleteResolution {
+            display: none !important;
+            overflow-x: hidden;
+            width: 0 !important;
+            transition: width 3s;
+        }
+
+        &:hover {
+            > button.deleteResolution {
+                display: inline-block !important;
+                width: fit-content !important;
+            }
+
+            .resolution-icon {
+                display: none !important;
+            }
+
+            .resolution-erase {
+                display: block !important;
+            }
+        } 
+
+        .resolution-icon {
+            display: block !important;
+        }
+
+        .resolution-erase {
+            display: none !important;
+        }
+    }
+}
+
+#resolutionControls:hover #addResolutionCollapse {
+    display: flex !important;
+}
+
+#resolutionDropdown, #webDriversDropdown, #themesDropdown {
+    padding: 0;
+    border: none;
+    min-width: 275px;
+    overflow: hidden
+}
+
+#themesDropdown {
+    min-width: 175px;
+}
+
+#resolutionDropdown li.dropdown-item > .resolution-item {
+    width: 275px;
+}
+
+.resolution-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    color: var(--bs-body-color) !important;
+    background-color: var(--bs-body-bg);
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgba(var(--bs-secondary-bg-rgb), 0.3);
+    }
+
+    > * {
+        padding: .5rem 1rem .5rem 1rem;
+        border: 0;
+        cursor: pointer;
+    }
+}
+
+.accented:hover {
+    color: var(--bs-light) !important;
+    background-color: rgba(var(--bs-primary-rgb), 0.7) !important;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number].no-arrows {
+    -moz-appearance: textfield;
+}

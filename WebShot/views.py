@@ -5,14 +5,14 @@ Handle views for the application.
 import json
 import asyncio
 from typing import Generator, Any
+
 from quart import (
     Blueprint,
     render_template,
     request,
     send_file,
     Response,
-    make_response,
-    current_app
+    make_response
 )
 
 from webscraper import WebScraper
