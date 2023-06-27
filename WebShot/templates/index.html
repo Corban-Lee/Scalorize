@@ -117,113 +117,65 @@
                     <button id="btnScreenSizes" class="btn btn-sidebar shadow-sm me-3" data-bs-toggle="dropdown">
                         <i class="bi bi-sliders2"></i>
                     </button>
-                    <ul id="resolutionDropdown" class="dropdown-menu shadow-lg py-2 mt-3 rounded">
+                    <div id="resolutionDropdown" class="dropdown-menu shadow-lg py-2 mt-3 rounded">
+                        <ul class="p-0">
 
-                        <li class="dropdown-item p-0 d-flex">
-                            <div class="resolution-item">
-                                <button class="btn">
-                                    <input id="resolution_1920x1080" type="checkbox" class="form-check-input">
-                                </button>
-                                <label for="resolution_1920x1080">
-                                    1920
-                                    <i class="bi bi-x"></i>
-                                    1080
-                                </label>
-                                <button class="btn">
-                                    <i class="bi bi-pc-display-horizontal"></i>
-                                </button>
-                            </div>
-                            <div class="resolution-collapse collapse collapse-horizontal bg-body p-0">
-                                <div class="btn-group px-2 d-flex align-items-center">
-                                    <button class="btn btn-sm btn-sidebar">
-                                        <i class="bi bi-chevron-up"></i>
+                            <!-- <li class="dropdown-item p-0 d-flex">
+                                <div class="resolution-item">
+                                    <button class="btn">
+                                        <input id="resolution_1920x1080" type="checkbox" class="form-check-input">
                                     </button>
-                                    <button class="btn btn-sm btn-sidebar">
-                                        <i class="bi bi-chevron-down"></i>
+                                    <label for="resolution_1920x1080">
+                                        1920
+                                        <i class="bi bi-x"></i>
+                                        1080
+                                    </label>
+                                    <button class="btn">
+                                        <i class="bi bi-pc-display-horizontal"></i>
                                     </button>
                                 </div>
-                            </div>
-                        </li>
-                        
-                        <li class="dropdown-item p-0 d-flex">
-                            <div class="resolution-item">
-                                <button class="btn">
-                                    <input id="resolution_1080x1920" type="checkbox" class="form-check-input">
-                                </button>
-                                <label for="resolution_1080x1920">
-                                    1080
-                                    <i class="bi bi-x"></i>
-                                    1920
-                                </label>
-                                <button class="btn">
-                                    <i class="bi bi-phone"></i>
-                                </button>
-                            </div>
-                            <div class="resolution-collapse collapse collapse-horizontal bg-body p-0">
-                                <div class="btn-group px-2 d-flex align-items-center">
-                                    <button class="btn btn-sm btn-sidebar">
-                                        <i class="bi bi-chevron-up"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-sidebar">
-                                        <i class="bi bi-chevron-down"></i>
-                                    </button>
+                                <div class="resolution-collapse collapse collapse-horizontal bg-body p-0">
+                                    <div class="btn-group px-2 d-flex align-items-center">
+                                        <button class="sort-resolution-up btn btn-sm btn-sidebar">
+                                            <i class="bi bi-chevron-up"></i>
+                                        </button>
+                                        <button class="sort-resolution-down btn btn-sm btn-sidebar">
+                                            <i class="bi bi-chevron-down"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        </li>
+                            </li>
+                             -->
 
-                        <li class="dropdown-item p-0 d-flex">
-                            <div class="resolution-item">
-                                <button class="btn">
-                                    <input id="resolution_720x1080" type="checkbox" class="form-check-input">
-                                </button>
-                                <label for="resolution_720x1080">
-                                    &nbsp;&nbsp;720
-                                    <i class="bi bi-x"></i>
-                                    1280
-                                </label>
-                                <button class="btn">
-                                    <i class="bi bi-phone"></i>
-                                </button>
-                            </div>
-                            <div class="resolution-collapse collapse collapse-horizontal bg-body p-0">
-                                <div class="btn-group px-2 d-flex align-items-center">
-                                    <button class="btn btn-sm btn-sidebar">
-                                        <i class="bi bi-chevron-up"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-sidebar">
-                                        <i class="bi bi-chevron-down"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </li>
+                        </ul>
 
                         <hr class="text-body-tertiary my-2">
-                        <li class="btn-group w-100 px-2">
+                        <div class="btn-group w-100 px-2">
                             <button id="openNewResolutionCollapse" class="resolution-item btn-sidebar w-50 px-3 py-2 text-body rounded justify-content-center" data-bs-toggle="collapse" data-bs-target="#newResolutionCollapse">
                                 New
                             </button>
-                            <button class="resolution-item btn-sidebar w-50 px-3 py-2 text-body rounded justify-content-center" data-bs-toggle="collapse" data-bs-target=".resolution-collapse">
+                            <button id="openSortResolutionCollapse" class="resolution-item btn-sidebar w-50 px-3 py-2 text-body rounded justify-content-center">
                                 Sort
                             </button>
-                        </li>
+                        </div>
 
-                        <li id="newResolutionCollapse" class="collapse">
+                        <div id="newResolutionCollapse" class="collapse">
                             <hr class="my-2 text-body-tertiary">
                             <div class="d-flex px-3 py-1">
                                 <div class="input-group me-3">
-                                    <input type="number" class="form-control text-end border-end-0 no-arrows" placeholder="width">
+                                    <input type="number" id="newResolutionWidth" class="form-control text-end border-end-0 no-arrows" placeholder="width">
                                     <span class="border-top border-bottom d-flex align-items-center">
                                         <i class="bi bi-x"></i>
                                     </span>
-                                    <input type="number" class="form-control border-start-0 no-arrows" placeholder="height">
+                                    <input type="number" id="newResolutionHeight" class="form-control border-start-0 no-arrows" placeholder="height">
                                 </div>
-                                <button class="btn btn-primary">
+                                <button id="createNewResolution" class="btn btn-primary">
                                     <i class="bi bi-plus-lg"></i>
                                 </button>
                             </div>
-                        </li>
+                        </div>
 
-                    </ul>
+                    </div>
                 </div>
                 
                 <div class="input-group shadow-sm rounded me-3">
