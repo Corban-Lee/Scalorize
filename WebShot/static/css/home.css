@@ -156,7 +156,7 @@ body {
 }
 
 #themesDropdown {
-  min-width: 175px;
+  min-width: 150px;
 }
 
 #resolutionDropdown li.dropdown-item > .resolution-item {
@@ -197,4 +197,8 @@ input::-webkit-inner-spin-button {
 
 input[type=number].no-arrows {
   -moz-appearance: textfield;
+}
+
+.dropdown-item:hover {
+  background: none;
 }
