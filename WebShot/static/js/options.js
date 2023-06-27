@@ -97,6 +97,7 @@ $("#openNewResolutionCollapse").on("click", function() {
 
 
 var sortCollapsed = true;
+var defaultSortText = $("#openSortResolutionCollapse").text();
 $("#openSortResolutionCollapse").on("click", function() {
 
     sortCollapsed = !sortCollapsed;
@@ -109,12 +110,12 @@ $("#openSortResolutionCollapse").on("click", function() {
     var text;
 
     if (!$("#resolutionDropdown ul").first().children().length) {
-        text = "Sort";
+        text = defaultSortText;
         alert("Please add a new resolution first.");        
     }
 
     else if (sortCollapsed) {
-        text = "Sort"
+        text = defaultSortText;
     }
 
     else {
@@ -124,7 +125,7 @@ $("#openSortResolutionCollapse").on("click", function() {
     $(this).text(text);
 });
 
-function addNewResolution(width, height) {
+function addNewResolution(width, height, active) {
     const displayName = `${width}x${height}`;
     const id = `resolution_${displayName}`;
     const showClass = sortCollapsed ? "": "show";
@@ -152,6 +153,9 @@ function addNewResolution(width, height) {
                     <button class="sort-resolution-down btn btn-sm btn-sidebar">
                         <i class="bi bi-chevron-down"></i>
                     </button>
+                    <button class="delete-resolution btn btn-sm btn-sidebar">
+                        <i class="bi bi-trash2"></i>
+                    </button>
                 </div>
             </div>
         </li>
@@ -168,14 +172,62 @@ function addNewResolution(width, height) {
         const resolutionContainer = $(this).closest(".dropdown-item");
         resolutionContainer.next().insertBefore(resolutionContainer);
     });
+
+    $(".delete-resolution").off("click").on("click", function() {
+        const resolutionContainer = $(this).closest(".dropdown-item");
+        const [_, resolution] = resolutionContainer.find("input[type=checkbox]").attr("id").split("_");
+        deleteResolution(resolution)
+        resolutionContainer.remove();
+    });
 }
 
-$("#createNewResolution").on("click", function() {
-    const width = $("#newResolutionWidth").val()
-    const height = $("#newResolutionHeight").val()
-    addNewResolution(width, height);
+function deleteResolution(resolution) {
+    var rawStorage = localStorage.getItem("resolutions");
+    rawStorage = rawStorage === null ? "[]" : rawStorage;
+    const parsedStorage = JSON.parse(rawStorage);
+
+    const filteredStorage = parsedStorage.filter(item => item.resolution !== resolution)
+    localStorage.setItem("resolutions", JSON.stringify(filteredStorage));
+}
+
+$("#newResolutionForm").on("submit", function(event) {
+    event.preventDefault();
+
+    const width = $("#newResolutionWidth").val();
+    const height = $("#newResolutionHeight").val();
+    const stringSize = `${width}x${height}`;
+    $("#newResolutionWidth").val("").focus();
+    $("#newResolutionHeight").val("");
+
+    // Save it to local storage
+    var rawStorage = localStorage.getItem("resolutions");
+    rawStorage = rawStorage === null ? "[]" : rawStorage;
+    var parsedStorage = JSON.parse(rawStorage);
+
+    const exists = parsedStorage.some(item => item.resolution === stringSize);
+    if (exists) {
+        alert("This resolution already exists.");
+        return;
+    }
+
+    parsedStorage.push({
+        "resolution": stringSize,
+        "active": false
+    });
+
+    localStorage.setItem("resolutions", JSON.stringify(parsedStorage));
+
+    // Display the new resolution
+    addNewResolution(width, height, false);
 });
 
-$(document).on("ready", function() {
+$(document).ready(function() {
+    var rawStorage = localStorage.getItem("resolutions");
+    rawStorage = rawStorage === null ? "[]" : rawStorage;
+    var parsedStorage = JSON.parse(rawStorage);
 
+    parsedStorage.forEach(function(item) {
+        const [width, height] = item.resolution.split("x");
+        addNewResolution(width, height, item.active === "true");
+    });
 });

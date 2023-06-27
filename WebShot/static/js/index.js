@@ -429,17 +429,17 @@ function updateResolutionStorage(newResolution=null, removeResolution=null) {
     localStorage.setItem("resolutions", JSON.stringify(parsed));
 }
 
-$(document).ready(function() {
-    var storageItem = localStorage.getItem("resolutions");
-    if (!storageItem) {
-        storageItem = "[]";
-    }
+// $(document).ready(function() {
+//     var storageItem = localStorage.getItem("resolutions");
+//     if (!storageItem) {
+//         storageItem = "[]";
+//     }
 
-    parsed = JSON.parse(storageItem);
-    parsed.forEach((resolution) => {
-        addResolution(...resolution.split("x"));
-    })
-});
+//     parsed = JSON.parse(storageItem);
+//     parsed.forEach((resolution) => {
+//         addResolution(...resolution.split("x"));
+//     })
+// });
 
 $("#addResolutionForm").on("submit", function(event) {
     event.preventDefault();

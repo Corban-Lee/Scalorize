@@ -155,24 +155,24 @@
                                 New
                             </button>
                             <button id="openSortResolutionCollapse" class="resolution-item btn-sidebar w-50 px-3 py-2 text-body rounded justify-content-center">
-                                Sort
+                                Actions
                             </button>
                         </div>
 
                         <div id="newResolutionCollapse" class="collapse">
                             <hr class="my-2 text-body-tertiary">
-                            <div class="d-flex px-3 py-1">
+                            <form id="newResolutionForm" class="d-flex px-3 py-1">
                                 <div class="input-group me-3">
-                                    <input type="number" id="newResolutionWidth" class="form-control text-end border-end-0 no-arrows" placeholder="width">
+                                    <input type="number" id="newResolutionWidth" class="form-control text-end border-end-0 no-arrows" placeholder="width" required>
                                     <span class="border-top border-bottom d-flex align-items-center">
                                         <i class="bi bi-x"></i>
                                     </span>
-                                    <input type="number" id="newResolutionHeight" class="form-control border-start-0 no-arrows" placeholder="height">
+                                    <input type="number" id="newResolutionHeight" class="form-control border-start-0 no-arrows" placeholder="height" required>
                                 </div>
-                                <button id="createNewResolution" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary">
                                     <i class="bi bi-plus-lg"></i>
                                 </button>
-                            </div>
+                            </form>
                         </div>
 
                     </div>
