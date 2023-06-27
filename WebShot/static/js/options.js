@@ -130,6 +130,9 @@ function addNewResolution(width, height, active) {
     const id = `resolution_${displayName}`;
     const showClass = sortCollapsed ? "": "show";
 
+    [width, height] = [parseInt(width), parseInt(height)];
+    const iconClass = width >= height ? "bi-pc-display-horizontal" : "bi-phone";
+
     const resolutionContainer = $(`
         <li class="dropdown-item p-0 d-flex">
             <div class="resolution-item">
@@ -142,7 +145,7 @@ function addNewResolution(width, height, active) {
                     ${height}
                 </label>
                 <button class="btn">
-                    <i class="bi bi-pc-display-horizontal"></i>
+                    <i class="bi ${iconClass}"></i>
                 </button>
             </div>
             <div class="resolution-collapse collapse collapse-horizontal bg-body p-0 ${showClass}">
@@ -154,7 +157,7 @@ function addNewResolution(width, height, active) {
                         <i class="bi bi-chevron-down"></i>
                     </button>
                     <button class="delete-resolution btn btn-sm btn-sidebar">
-                        <i class="bi bi-trash2"></i>
+                        <i class="bi bi-trash2 text-danger"></i>
                     </button>
                 </div>
             </div>
