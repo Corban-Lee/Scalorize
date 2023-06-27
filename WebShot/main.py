@@ -11,6 +11,7 @@ app.register_blueprint(index_blueprint)
 
 def main():
 
+    # Compile (and minify) SASS files
     css_directory = "WebShot/static/css/"
     scss_directory = "WebShot/static/scss/"
     sass.compile(dirname=(scss_directory, css_directory), output_style="expanded")  # set to "compressed" for production

@@ -134,50 +134,61 @@ function addNewResolution(width, height, active) {
     const iconClass = width >= height ? "bi-pc-display-horizontal" : "bi-phone";
 
     const resolutionContainer = $(`
-        <li class="dropdown-item p-0 d-flex">
-            <div class="resolution-item">
-                <button class="btn">
-                    <input id="${id}" type="checkbox" class="form-check-input">
-                </button>
-                <label for="${id}">
-                    ${width}
-                    <i class="bi bi-x"></i>
-                    ${height}
-                </label>
-                <button class="btn">
+        <li class="topdrop-item">
+            <button class="resolution-button btn topdrop-button">
+                <div class="resolution-area">
+                    <input type="checkbox" name="resolutions" id="${id}" class="form-check-input my-auto">
+                    <label for="${id}">
+                        ${width}
+                        <i class="bi bi-x"></i>
+                        ${height}
+                    </label>
                     <i class="bi ${iconClass}"></i>
-                </button>
-            </div>
-            <div class="resolution-collapse collapse collapse-horizontal bg-body p-0 ${showClass}">
-                <div class="btn-group px-2 d-flex align-items-center h-100 my-auto">
-                    <button class="sort-resolution-up btn btn-sm btn-sidebar">
-                        <i class="bi bi-chevron-up"></i>
-                    </button>
-                    <button class="sort-resolution-down btn btn-sm btn-sidebar">
-                        <i class="bi bi-chevron-down"></i>
-                    </button>
-                    <button class="delete-resolution btn btn-sm btn-sidebar">
-                        <i class="bi bi-trash2 text-danger"></i>
-                    </button>
                 </div>
-            </div>
+                <div class="collapse collapse-horizontal resolution-collapse ${showClass}">
+                    <div class="resolution-actions btn-group btn-group-sm">
+                        <span class="sort-resolution-up btn btn-sidebar">
+                            <i class="bi bi-chevron-up"></i>
+                        </span>
+                        <span class="sort-resolution-down btn btn-sidebar">
+                            <i class="bi bi-chevron-down"></i>
+                        </span>
+                        <span class="delete-resolution btn btn-sidebar">
+                            <i class="bi bi-trash2 text-danger"></i>
+                        </span>
+                    </div>
+                </div>
+            </button>
         </li>
     `);
     
     $("#resolutionDropdown ul").first().append(resolutionContainer);
 
+    resolutionContainer.find(".resolution-button").on("click", function(event) {
+        const checkbox = $(this).find("input[type=checkbox]");
+        checkbox.prop("checked", !checkbox.prop("checked"));
+    });
+
+    resolutionContainer.find(".resolution-button .resolution-actions").on("click", function(event) {
+        event.stopPropagation();
+    });
+
+    resolutionContainer.find("input[type=checkbox]").on("click", function(event) {
+        event.stopPropagation();
+    });
+
     $(".sort-resolution-up").off("click").on("click", function() {
-        const resolutionContainer = $(this).closest(".dropdown-item");
+        const resolutionContainer = $(this).closest(".topdrop-item");
         resolutionContainer.prev().insertAfter(resolutionContainer);
     });
     
     $(".sort-resolution-down").off("click").on("click", function() {
-        const resolutionContainer = $(this).closest(".dropdown-item");
+        const resolutionContainer = $(this).closest(".topdrop-item");
         resolutionContainer.next().insertBefore(resolutionContainer);
     });
 
     $(".delete-resolution").off("click").on("click", function() {
-        const resolutionContainer = $(this).closest(".dropdown-item");
+        const resolutionContainer = $(this).closest(".topdrop-item");
         const [_, resolution] = resolutionContainer.find("input[type=checkbox]").attr("id").split("_");
         deleteResolution(resolution)
         resolutionContainer.remove();
