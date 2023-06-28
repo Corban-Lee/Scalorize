@@ -155,7 +155,11 @@ body {
 }
 
 #themesDropdown {
-  min-width: 150px;
+  min-width: 175px;
+}
+
+#webDriversDropdown {
+  min-width: 175px;
 }
 
 #resolutionDropdown li.dropdown-item > .resolution-item {

@@ -151,47 +151,35 @@
                 <div class="input-group shadow-sm rounded me-3">
                     <div class="dropdown">
                         <button id="btnWebDrivers" class="dropdown-toggle btn btn-sidebar rounded-end-0" data-bs-toggle="dropdown">
-                            <i class="bi bi-browser-firefox me-1"></i>
+                            <i id="currentWebDriverIcon" class="bi me-1"></i>
                         </button>
-                        <ul id="webDriversDropdown" class="topbar-dropdown-menu dropdown-menu shadow-lg py-2 mt-3 rounded">
+                        <div id="webDriversDropdown" class="topdrop-menu dropdown-menu">
+                            <ul class="ps-0 mb-0">
 
-                            <li class="topbar-dropdown-item resolution-item">
-                                <button class="btn">
-                                    <input type="radio" name="webdriver" id="driver_chrome" class="form-check-input">
-                                </button>
-                                <label for="driver_chrome">
-                                    Chrome
-                                </label>
-                                <button class="btn">
-                                    <i class="bi bi-browser-chrome"></i>
-                                </button>
-                            </li>
+                                <li class="topdrop-item">
+                                    <input type="radio" name="driver" id="driver_chrome" class="btn-check" value="chrome" data-icon-class="bi-browser-chrome">
+                                    <label for="driver_chrome" class="btn topdrop-button theme-btn">
+                                        <i class="bi bi-browser-chrome ms-2 me-3"></i>
+                                        Chrome
+                                    </label>
+                                </li>
+                                <li class="topdrop-item">
+                                    <input type="radio" name="driver" id="driver_firefox" class="btn-check" value="firefox" data-icon-class="bi-browser-firefox">
+                                    <label for="driver_firefox" class="btn topdrop-button theme-btn">
+                                        <i class="bi bi-browser-firefox ms-2 me-3"></i>
+                                        Firefox
+                                    </label>
+                                </li>
+                                <li class="topdrop-item">
+                                    <input type="radio" name="driver" id="driver_safari" class="btn-check" value="safari" data-icon-class="bi-browser-safari">
+                                    <label for="driver_safari" class="btn topdrop-button theme-btn">
+                                        <i class="bi bi-browser-safari ms-2 me-3"></i>
+                                        Safari
+                                    </label>
+                                </li>
 
-                            <li class="dropdown-item resolution-item">
-                                <button class="btn">
-                                    <input type="radio" name="webdriver" id="driver_firefox" class="form-check-input">
-                                </button>
-                                <label for="driver_firefox">
-                                    Firefox
-                                </label>
-                                <button class="btn">
-                                    <i class="bi bi-browser-firefox"></i>
-                                </button>
-                            </li>
-
-                            <li class="dropdown-item resolution-item">
-                                <button class="btn">
-                                    <input type="radio" name="webdriver" id="driver_safari" class="form-check-input">
-                                </button>
-                                <label for="driver_safari">
-                                    Safari
-                                </label>
-                                <button class="btn">
-                                    <i class="bi bi-browser-safari"></i>
-                                </button>
-                            </li>
-
-                        </ul>
+                            </ul>
+                        </div>
                     </div>
 
                     <input type="search" class="form-control border-0" placeholder="Enter a web address here, then press 'enter' or the search button to get started">
@@ -200,13 +188,9 @@
                     </button>
                 </div>
 
-                <button class="btn btn-sidebar shadow-sm me-3" data-bs-toggle="modal" data-bs-target="#optionsModal">
-                    <i class="bi bi-gear"></i>
-                </button>
-
                 <div class="dropdown">
                     <button class="btn btn-sidebar dropdown-toggle shadow-sm me-3" data-bs-toggle="dropdown">
-                        <i id="currentThemeIcon" class="bi bi-moon-stars me-1"></i>
+                        <i id="currentThemeIcon" class="bi me-1"></i>
                     </button>
                     <div id="themesDropdown" class="topdrop-menu dropdown-menu ">
                         <ul class="ps-0 mb-0">
@@ -235,34 +219,11 @@
 
                         </ul>
                     </div>
-                    <!-- <ul id="themesDropdown" class="dropdown-menu shadow-lg py-2 mt-3 rounded">
-
-                        <li class="dropdown-item resolution-item">
-                            <input type="radio" name="theme" id="theme_light" class="btn-check">
-                            <label for="theme_light" class="btn btn-sidebar rounded-0 w-100 text-start">
-                                <i class="bi bi-sun mx-2"></i>
-                                Light
-                            </label>
-                        </li>
-
-                        <li class="dropdown-item resolution-item">
-                            <input type="radio" name="theme" id="theme_dark" class="btn-check">
-                            <label for="theme_dark" class="btn btn-sidebar rounded-0 w-100 text-start">
-                                <i class="bi bi-moon-stars mx-2"></i>
-                                Dark
-                            </label>
-                        </li>
-
-                        <li class="dropdown-item resolution-item">
-                            <input type="radio" name="theme" id="theme_auto" class="btn-check">
-                            <label for="theme_auto" class="btn btn-sidebar rounded-0 w-100 text-start">
-                                <i class="bi bi-window mx-2"></i>
-                                Light
-                            </label>
-                        </li>
-
-                    </ul> -->
                 </div>
+
+                <button class="btn btn-sidebar shadow-sm me-3" data-bs-toggle="modal" data-bs-target="#optionsModal">
+                    <i class="bi bi-gear"></i>
+                </button>
 
                 <button class="btn btn-sidebar shadow-sm">
                     <i class="bi bi-question-lg"></i>
@@ -323,26 +284,8 @@
                     <div class="modal-body">
 
                         <div class="row g-4 mb-4 mt-2">
-                            <div class="col-2 text-end form-switch">
-                                <input type="checkbox" name="option-useDarkMode" id="option-useDarkMode" class="form-check-input">
-                            </div>
-                            <div class="col-10">
-                                <label for="option-useDarkMode" class="d-flex flex-row">
-                                    <div class="me-3">
-                                        <i class="bi bi-moon-stars"></i>
-                                    </div>
-                                    <div>
-                                        <span class="text-secondary-emphasis">Use Dark Mode</span>
-                                        <br>
-                                        <small class="text-body-secondary">Use darker colours for this application.</small>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="row g-4 mb-4 mt-2">
                             <div class="col-2 d-flex justify-content-end align-items-start">
-                                <input type="number" name="option-semaphoreLimit" id="option-semaphoreLimit" class="form-control form-control-sm" style="width: 40px" value="10">
+                                <input type="number" name="option-semaphoreLimit" id="option-semaphoreLimit" class="form-control form-control-sm no-arrows" style="width: 40px" value="10">
                             </div>
                             <div class="col-10">
                                 <label for="option-semaphoreLimit" class="d-flex flex-row">

@@ -162,7 +162,11 @@ body {
 }
 
 #themesDropdown {
-    min-width: 150px;
+    min-width: 175px;
+}
+
+#webDriversDropdown {
+    min-width: 175px;
 }
 
 #resolutionDropdown li.dropdown-item > .resolution-item {
@@ -202,6 +206,7 @@ input::-webkit-inner-spin-button {
 }
 
 input[type=number].no-arrows {
+    appearance: textfield;
     -moz-appearance: textfield;
 }
 
