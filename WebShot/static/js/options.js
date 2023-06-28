@@ -260,7 +260,7 @@ $(document).ready(function() {
 $(document).ready(function() {
     var theme = localStorage.getItem("theme");
     theme = theme === null ? "auto" : theme;
-    loadTheme(theme);
+    $(`#themesDropdown input[value="${theme}"]`).click();
 });
 
 $("#themesDropdown input[type=radio]").change(function() {
@@ -274,6 +274,10 @@ function loadTheme(theme) {
     }
 
     $(document.body).attr("data-bs-theme", theme)
+
+    const themeIcon = $("#themesDropdown input[type=radio]:checked").data("icon-class");
+    $("#currentThemeIcon").removeClass("bi-sun bi-moon-stars bi-window").addClass(themeIcon);
+    
 
     const brandLogo = theme === "dark" ? logoAlt : logo;
     $("#brand img").attr("src", brandLogo);

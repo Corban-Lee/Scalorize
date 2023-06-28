@@ -206,27 +206,27 @@
 
                 <div class="dropdown">
                     <button class="btn btn-sidebar dropdown-toggle shadow-sm me-3" data-bs-toggle="dropdown">
-                        <i class="bi bi-moon-stars me-1"></i>
+                        <i id="currentThemeIcon" class="bi bi-moon-stars me-1"></i>
                     </button>
                     <div id="themesDropdown" class="topdrop-menu dropdown-menu ">
                         <ul class="ps-0 mb-0">
 
                             <li class="topdrop-item">
-                                <input type="radio" name="theme" id="theme_light" class="btn-check" value="light">
+                                <input type="radio" name="theme" id="theme_light" class="btn-check" value="light" data-icon-class="bi-sun">
                                 <label for="theme_light" class="btn topdrop-button theme-btn">
                                     <i class="bi bi-sun ms-2 me-3"></i>
                                     Light
                                 </label>
                             </li>
                             <li class="topdrop-item">
-                                <input type="radio" name="theme" id="theme_dark" class="btn-check" value="dark">
+                                <input type="radio" name="theme" id="theme_dark" class="btn-check" value="dark" data-icon-class="bi-moon-stars">
                                 <label for="theme_dark" class="btn topdrop-button theme-btn">
                                     <i class="bi bi-moon-stars ms-2 me-3"></i>
                                     Dark
                                 </label>
                             </li>
                             <li class="topdrop-item">
-                                <input type="radio" name="theme" id="theme_auto" class="btn-check" value="auto">
+                                <input type="radio" name="theme" id="theme_auto" class="btn-check" value="auto" data-icon-class="bi-window">
                                 <label for="theme_auto" class="btn topdrop-button theme-btn">
                                     <i class="bi bi-window ms-2 me-3"></i>
                                     Auto
