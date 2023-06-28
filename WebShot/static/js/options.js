@@ -3,27 +3,27 @@
  * Dark mode settings
  */
 
-$(document).ready(function() {
-    const useDarkMode = localStorage.getItem("option-useDarkMode");
-    setDarkMode(useDarkMode === "true");
-});
+// $(document).ready(function() {
+//     const useDarkMode = localStorage.getItem("option-useDarkMode");
+//     setDarkMode(useDarkMode === "true");
+// });
 
-$("#option-useDarkMode").on("click", function() {
-    const enable = $(this).prop("checked");
-    localStorage.setItem("option-useDarkMode", enable);
-    setDarkMode(enable);
-});
+// $("#option-useDarkMode").on("click", function() {
+//     const enable = $(this).prop("checked");
+//     localStorage.setItem("option-useDarkMode", enable);
+//     setDarkMode(enable);
+// });
 
-function setDarkMode(enable) {
-    $("#option-useDarkMode").prop("checked", enable);
+// function setDarkMode(enable) {
+//     $("#option-useDarkMode").prop("checked", enable);
 
-    const theme = enable ? "dark" : "light"
-    $(document.body).attr("data-bs-theme", theme);
+//     const theme = enable ? "dark" : "light"
+//     $(document.body).attr("data-bs-theme", theme);
 
-    // Update the logo to match the theme
-    const sidebarLogo = !enable ? logo : logoAlt;
-    $("#brand img").attr("src", sidebarLogo);
-}
+//     // Update the logo to match the theme
+//     const sidebarLogo = !enable ? logo : logoAlt;
+//     $("#brand img").attr("src", sidebarLogo);
+// }
 
 
 /**
@@ -87,11 +87,13 @@ $("#option-allowForeignDomains").on("click", function() {
  */
 
 $("#openNewResolutionCollapse").on("click", function() {
+    disableButtonTemporarily(this, 350);
+
     if ($(this).hasClass("collapsed")) {
         $(this).text("New");
     }
     else {
-        $(this).text("Collapse");
+        $(this).text("Close New");
     }
 });
 
@@ -99,6 +101,7 @@ $("#openNewResolutionCollapse").on("click", function() {
 var sortCollapsed = true;
 var defaultSortText = $("#openSortResolutionCollapse").text();
 $("#openSortResolutionCollapse").on("click", function() {
+    disableButtonTemporarily(this, 350);
 
     sortCollapsed = !sortCollapsed;
 
@@ -119,7 +122,7 @@ $("#openSortResolutionCollapse").on("click", function() {
     }
 
     else {
-        text = "Collapse";
+        text = "Close Actions";
     }
 
     $(this).text(text);
@@ -249,3 +252,29 @@ $(document).ready(function() {
         addNewResolution(width, height, item.active === "true");
     });
 });
+
+/**
+ * Themes
+ */
+
+$(document).ready(function() {
+    var theme = localStorage.getItem("theme");
+    theme = theme === null ? "auto" : theme;
+    loadTheme(theme);
+});
+
+$("#themesDropdown input[type=radio]").change(function() {
+    loadTheme(this.value);
+    localStorage.setItem("theme", this.value);
+});
+
+function loadTheme(theme) {
+    if (theme === "auto") {
+        theme = "dark"; // temp
+    }
+
+    $(document.body).attr("data-bs-theme", theme)
+
+    const brandLogo = theme === "dark" ? logoAlt : logo;
+    $("#brand img").attr("src", brandLogo);
+}

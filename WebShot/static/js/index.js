@@ -455,4 +455,11 @@ $("#addResolutionForm").on("submit", function(event) {
 
 $(".dropdown-menu").click(function(e){
     e.stopPropagation();
- })
+})
+
+function disableButtonTemporarily(buttonElement, msTimeout) {
+    $(buttonElement).prop("disabled", true);
+    setTimeout(function() {
+        $(buttonElement).prop("disabled", false);
+    }, msTimeout);
+}
