@@ -47,7 +47,7 @@ $("#searchForm").submit(function(event) {
         return;
     }
 
-    const browser = $("input[name='drivers']:checked").val();
+    const browser = $("input[name='driver']:checked").val();
 
     if (!browser) {
         alert("Please select a driver from the drivers dropdown");

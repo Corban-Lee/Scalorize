@@ -199,6 +199,7 @@ input::-webkit-inner-spin-button {
 }
 
 input[type=number].no-arrows {
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 
@@ -254,6 +255,20 @@ input[type=number].no-arrows {
 .btn-check:checked + .theme-btn {
   color: var(--bs-light);
   background-color: var(--bs-primary);
+}
+
+.topbar-button {
+  color: var(--bs-body-color);
+  background-color: var(--bs-body-bg);
+  border: none;
+}
+
+.topbar-button:hover {
+  background-color: rgba(var(--bs-secondary-bg-rgb), 0.3);
+}
+
+.topbar-button.show, .topbar-button:active {
+  background-color: var(--bs-secondary-bg) !important;
 }
 
 .cursor-default {

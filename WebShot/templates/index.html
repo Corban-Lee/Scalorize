@@ -15,95 +15,14 @@
         <div class="bg-body-tertiary shadow overflow-auto" id="sidebar">
 
             <!-- Branding -->
-             <div class="bg-body-secondary shadow-sm text-center mb-3 px-4 py-3">
+             <div class="bg-body-secondary shadow-sm text-center px-4 py-3">
                 <a href="/" id="brand" class="w-100">
                     <img src="{{ url_for('static', filename='images/logo-text.png') }}" alt="product logo" height="45">
                 </a>
             </div>
 
-            <!--
-            <form id="searchForm" class="p-4 pb-0">
-                <div class="input-group mb-4 shadow-sm rounded">
-                    <input class="form-control border-0" type="search" name="search" id="search" placeholder="https://example.com">
-                    <button type="submit" class="btn btn-sidebar rounded-start-0" id="searchBtn">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </div>
-                <div class="d-flex flex-wrap justify-content-between align-items-center">
-                    <div class="d-flex btn-group me-3 shadow-sm mb-4">
-                        <button type="button" id="btnResolutions" class="btn btn-sidebar dropdown-toggle rounded-end-0 collapsed" data-bs-toggle="collapse" data-bs-target="#searchOptions">
-                            <i class="bi bi-sliders2-vertical"></i>
-                        </button>
-                        <button type="button" class="btn btn-sidebar" data-bs-toggle="modal" data-bs-target="#optionsModal">
-                            <i class="bi bi-gear"></i>
-                        </button>
-                    </div>
-                    <div class="d-flex mb-4 btn-group">
-                        <button type="button" id="btnSortFiletree" class="btn btn-sidebar shadow-sm">
-                            <i class="bi bi-sort-alpha-up"></i>
-                        </button>
-                        <button type="button" id="btnListView" class="btn btn-sidebar shadow-sm">
-                            <i class="bi bi-list"></i>
-                        </button>
-                        <button type="button" id="btnCollapseAll" class="btn btn-sidebar shadow-sm">
-                            <i class="bi bi-chevron-double-down"></i>
-                        </button>
-                    </div>
-                </div>
-            </form>
-
-            <div id="searchOptions" class="collapse p-4 pt-2">
-                <div id="driversOptions" class="sidebar-container overflow-auto w-100 px-2 pb-3">
-
-                    <h3 class="h5 mb-4 d-flex justify-content-between">
-                        <span class="small">
-                            <span class="pe-4">Drivers</span>
-                        </span>
-                        <span class="small">
-                            <i class="bi bi-info-circle text-info" data-bs-toggle="tooltip" data-bs-title="Choose your preferred browser for automated control" data-bs-placement="bottom"></i>
-                        </span>
-                    </h3>
-
-                    <div class="form-check d-flex align-items-center pb-1">
-                        <label for="driver-chrome" class="form-check-label d-flex flex-grow-1 justify-content-between fs-5 ps-2">
-                            <input type="radio" id="driver-chrome" class="form-check-input mb-1" name="drivers" value="chrome">
-                            <span class="fs-6">Chrome</span>
-                            <i class="bi bi-browser-chrome text-body-secondary"></i>
-                        </label>
-                    </div>
-                    <div class="form-check d-flex align-items-center pb-1">
-                        <label for="driver-firefox" class="form-check-label d-flex flex-grow-1 justify-content-between fs-5 ps-2">
-                            <input type="radio" id="driver-firefox" class="form-check-input mb-1" name="drivers" value="firefox">
-                            <span class="fs-6">Firefox</span>
-                            <i class="bi bi-browser-firefox text-body-secondary"></i>
-                        </label>
-                    </div>
-                    <div class="form-check d-flex align-items-center pb-1">
-                        <label for="driver-safari" class="form-check-label d-flex flex-grow-1 justify-content-between fs-5 ps-2">
-                            <input type="radio" id="driver-safari" class="ps-0 form-check-input mb-1" name="drivers" value="safari">
-                            <span class="fs-6">Safari</span>
-                            <i class="bi bi-browser-safari text-body-secondary"></i>
-                        </label>
-                    </div>
-
-                    <div id="resolutionOptions" class="mt-4 pt-3">
-                        <h3 class="h5 mb-4 d-flex justify-content-between">
-                            <span class="small">
-                                <span class="pe-4">Resolutions</span>
-                            </span>
-                            <span class="small">
-                                <i class="bi bi-info-circle text-info ms-1" data-bs-toggle="tooltip" data-bs-title="Select your desired screen resolutions for the webdriver" data-bs-placement="bottom"></i>
-                            </span>
-                        </h3>
-                    </div>
-                    <button type="button" class="btn btn-sidebar shadow-sm w-100 mt-4" data-bs-toggle="modal" data-bs-target="#resolutionModal">
-                        Add Resolution
-                    </button>
-                </div>
-            </div> -->
-
             <!-- Filetree -->
-            <div id="filetree" class="p-4 pt-0">
+            <div id="filetree" class="p-4">
                 <ul class="pe-3"></ul>
             </div>
         </div>
@@ -114,7 +33,7 @@
             <div class="w-100 bg-body-tertiary px-4 d-flex align-items-center shadow-sm position-sticky sticky-top" style="min-height: 77px">
                 
                 <div class="dropdown">
-                    <button id="btnScreenSizes" class="btn btn-sidebar shadow-sm me-3" data-bs-toggle="dropdown">
+                    <button id="btnScreenSizes" class="btn topbar-button shadow-sm me-3" data-bs-toggle="dropdown">
                         <i class="bi bi-sliders2"></i>
                     </button>
                     <div id="resolutionDropdown" class="topdrop-menu dropdown-menu">
@@ -147,10 +66,10 @@
 
                     </div>
                 </div>
-                
-                <div class="input-group shadow-sm rounded me-3">
+            
+                <form id="searchForm" class="input-group shadow-sm rounded me-3">
                     <div class="dropdown">
-                        <button id="btnWebDrivers" class="dropdown-toggle btn btn-sidebar rounded-end-0" data-bs-toggle="dropdown">
+                        <button type="button" id="btnWebDrivers" class="dropdown-toggle btn topbar-button rounded-end-0" data-bs-toggle="dropdown">
                             <i id="currentWebDriverIcon" class="bi me-1"></i>
                         </button>
                         <div id="webDriversDropdown" class="topdrop-menu dropdown-menu">
@@ -182,37 +101,37 @@
                         </div>
                     </div>
 
-                    <input type="search" class="form-control border-0" placeholder="Enter a web address here, then press 'enter' or the search button to get started">
-                    <button class="btn btn-sidebar">
+                    <input type="search" id="search" class="form-control border-0" placeholder="Enter a web address here, then press 'enter' or the search button to get started">
+                    <button type="submit" class="btn topbar-button">
                         <i class="bi bi-search"></i>
                     </button>
-                </div>
+                </form>
 
                 <div class="dropdown">
-                    <button class="btn btn-sidebar dropdown-toggle shadow-sm me-3" data-bs-toggle="dropdown">
+                    <button class="btn topbar-button dropdown-toggle shadow-sm me-3" data-bs-toggle="dropdown">
                         <i id="currentThemeIcon" class="bi me-1"></i>
                     </button>
                     <div id="themesDropdown" class="topdrop-menu dropdown-menu ">
                         <ul class="ps-0 mb-0">
 
                             <li class="topdrop-item">
-                                <input type="radio" name="theme" id="theme_light" class="btn-check" value="light" data-icon-class="bi-sun">
+                                <input type="radio" name="theme" id="theme_light" class="btn-check" value="light" data-icon-class="bi-sun-fill">
                                 <label for="theme_light" class="btn topdrop-button theme-btn">
-                                    <i class="bi bi-sun ms-2 me-3"></i>
+                                    <i class="bi bi-sun-fill ms-2 me-3"></i>
                                     Light
                                 </label>
                             </li>
                             <li class="topdrop-item">
-                                <input type="radio" name="theme" id="theme_dark" class="btn-check" value="dark" data-icon-class="bi-moon-stars">
+                                <input type="radio" name="theme" id="theme_dark" class="btn-check" value="dark" data-icon-class="bi-moon-stars-fill">
                                 <label for="theme_dark" class="btn topdrop-button theme-btn">
-                                    <i class="bi bi-moon-stars ms-2 me-3"></i>
+                                    <i class="bi bi-moon-stars-fill ms-2 me-3"></i>
                                     Dark
                                 </label>
                             </li>
                             <li class="topdrop-item">
-                                <input type="radio" name="theme" id="theme_auto" class="btn-check" value="auto" data-icon-class="bi-window">
+                                <input type="radio" name="theme" id="theme_auto" class="btn-check" value="auto" data-icon-class="bi-circle-half">
                                 <label for="theme_auto" class="btn topdrop-button theme-btn">
-                                    <i class="bi bi-window ms-2 me-3"></i>
+                                    <i class="bi bi-circle-half ms-2 me-3"></i>
                                     Auto
                                 </label>
                             </li>
@@ -221,11 +140,11 @@
                     </div>
                 </div>
 
-                <button class="btn btn-sidebar shadow-sm me-3" data-bs-toggle="modal" data-bs-target="#optionsModal">
-                    <i class="bi bi-gear"></i>
+                <button class="btn topbar-button shadow-sm me-3" data-bs-toggle="modal" data-bs-target="#optionsModal">
+                    <i class="bi bi-gear-fill"></i>
                 </button>
 
-                <button class="btn btn-sidebar shadow-sm">
+                <button class="btn topbar-button shadow-sm">
                     <i class="bi bi-question-lg"></i>
                 </button>
             </div>

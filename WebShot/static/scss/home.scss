@@ -1,4 +1,6 @@
 
+
+
 @font-face {
     font-family: "Helios";
     src: url("/static/fonts/Helios-Light.ttf");
@@ -269,6 +271,27 @@ input[type=number].no-arrows {
     color: var(--bs-light);
     background-color: var(--bs-primary); 
 }
+
+// Custom Topbar button
+
+.topbar-button {
+
+    color: var(--bs-body-color);
+    background-color: var(--bs-body-bg);
+    border: none;
+
+    &:hover {
+        background-color: rgba(var(--bs-secondary-bg-rgb), 0.3);
+    }
+
+    &.show, &:active {
+        background-color: var(--bs-secondary-bg) !important;
+    }
+}
+
+
+
+// Other
 
 .cursor-default {
     cursor: default !important;

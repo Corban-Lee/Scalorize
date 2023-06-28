@@ -105,15 +105,16 @@ function addNewResolution(width, height, active) {
     const displayName = `${width}x${height}`;
     const id = `resolution_${displayName}`;
     const showClass = sortCollapsed ? "": "show";
+    const checked = active ? "checked" : "";
 
     [width, height] = [parseInt(width), parseInt(height)];
-    const iconClass = width >= height ? "bi-pc-display-horizontal" : "bi-phone";
+    const iconClass = width >= height ? "bi-tv" : "bi-phone";
 
     const resolutionContainer = $(`
         <li class="topdrop-item">
             <button class="resolution-button btn topdrop-button cursor-default">
                 <div class="resolution-area">
-                    <input type="checkbox" name="resolutions" id="${id}" class="form-check-input my-auto">
+                    <input type="checkbox" name="resolutions" id="${id}" class="form-check-input my-auto" value="${displayName}" ${checked}>
                     <label for="${id}">
                         ${width}
                         <i class="bi bi-x"></i>
@@ -244,7 +245,7 @@ function loadTheme(theme) {
     $(document.body).attr("data-bs-theme", theme)
 
     const themeIcon = $("#themesDropdown input[type=radio]:checked").data("icon-class");
-    $("#currentThemeIcon").removeClass("bi-sun bi-moon-stars bi-window").addClass(themeIcon);
+    $("#currentThemeIcon").removeClass("bi-sun-fill bi-moon-stars-fill bi-circle-half").addClass(themeIcon);
     
 
     const brandLogo = theme === "dark" ? logoAlt : logo;
