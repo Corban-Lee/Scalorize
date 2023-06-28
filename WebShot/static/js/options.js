@@ -135,7 +135,7 @@ function addNewResolution(width, height, active) {
 
     const resolutionContainer = $(`
         <li class="topdrop-item">
-            <button class="resolution-button btn topdrop-button">
+            <button class="resolution-button btn topdrop-button cursor-default">
                 <div class="resolution-area">
                     <input type="checkbox" name="resolutions" id="${id}" class="form-check-input my-auto">
                     <label for="${id}">
@@ -174,6 +174,10 @@ function addNewResolution(width, height, active) {
     });
 
     resolutionContainer.find("input[type=checkbox]").on("click", function(event) {
+        event.stopPropagation();
+    });
+
+    resolutionContainer.find("label").on("click", function(event) {
         event.stopPropagation();
     });
 
