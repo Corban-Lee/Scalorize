@@ -86,11 +86,7 @@ $("#searchForm").submit(function(event) {
     // Disable UI
     $("#search").prop("disabled", true);
     $("#searchBtn").prop("disabled", true);
-    $("input[name='drivers']").prop("disabled", true);
-
-    $("#sidebar .dropdown-toggle:not(.collapsed)").click();
-    $("#btnDrivers").prop("disabled", true);
-    $("#btnResolutions").prop("disabled", true);
+    $("#btnWebDrivers").prop("disabled", true);
 
     // Show new task
     $("#taskToast .timer").text("0.0");
@@ -111,9 +107,7 @@ $("#searchForm").submit(function(event) {
         // Enable UI
         $("#search").prop("disabled", false);
         $("#searchBtn").prop("disabled", false);
-        $("input[name='drivers']").prop("disabled", false);
-        $("#btnDrivers").prop("disabled", false);
-        $("#btnResolutions").prop("disabled", false);
+        $("#btnWebDrivers").prop("disabled", false);
 
         // Hide task
         $("#taskToast").removeClass("show");
@@ -170,6 +164,7 @@ function createOrUpdateShelf(imageData, filePath, pageTitle, pageUrl) {
         var pageUrlWithoutScheme = pageUrl;
     }
 
+    // Shelf already exists, add the item and move on.
     if (shelves.includes(pageUrl)) {
         $(`.result-shelf[data-url="${pageUrl}"] .result-images`).first().append(`
             <div class="col-xxl-2 col-xl-3 col-lg-4 col-sm-6 mb-4">
@@ -224,8 +219,15 @@ function updateFileTree(pageUrl) {
     const urlParts = (url.hostname + "/" + url.pathname).split("/").filter(part => part !== "");
     var parent = $("#filetree > ul").first();
 
+    $("#taskToast .breadcrumb").html("");
+
     let currentPath = "";
     urlParts.forEach((part, index) => {
+
+        $("#taskToast .breadcrumb").append(`
+            <li class="breadcrumb-item">${part}</li>
+        `);
+
         var currentUrl = url.origin;
         if (index !== 0) {
             currentPath += part + "/";

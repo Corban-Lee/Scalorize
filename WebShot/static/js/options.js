@@ -107,6 +107,9 @@ function addNewResolution(width, height, active) {
     const showClass = sortCollapsed ? "": "show";
     const checked = active ? "checked" : "";
 
+    const widthSpacer = "&nbsp;&nbsp;".repeat(Math.max(0, 4 - `${width}`.length));
+    const heightSpacer = "&nbsp;&nbsp;".repeat(Math.max(0, 4 - `${height}`.length));
+
     [width, height] = [parseInt(width), parseInt(height)];
     const iconClass = width >= height ? "bi-tv" : "bi-phone";
 
@@ -116,21 +119,23 @@ function addNewResolution(width, height, active) {
                 <div class="resolution-area">
                     <input type="checkbox" name="resolutions" id="${id}" class="form-check-input my-auto" value="${displayName}" ${checked}>
                     <label for="${id}">
-                        ${width}
+                        ${widthSpacer}${width}
                         <i class="bi bi-x"></i>
-                        ${height}
+                        ${height}${heightSpacer}
                     </label>
                     <i class="bi ${iconClass}"></i>
                 </div>
                 <div class="collapse collapse-horizontal resolution-collapse ${showClass}">
-                    <div class="resolution-actions btn-group btn-group-sm">
-                        <span class="sort-resolution-up btn btn-sidebar">
-                            <i class="bi bi-chevron-up"></i>
-                        </span>
-                        <span class="sort-resolution-down btn btn-sidebar">
-                            <i class="bi bi-chevron-down"></i>
-                        </span>
-                        <span class="delete-resolution btn btn-sidebar">
+                    <div class="resolution-actions">
+                        <div class="btn-group btn-group-sm me-2">
+                            <span class="sort-resolution-up btn btn-sidebar">
+                                <i class="bi bi-chevron-up"></i>
+                            </span>
+                            <span class="sort-resolution-down btn btn-sidebar">
+                                <i class="bi bi-chevron-down"></i>
+                            </span>
+                        </div>
+                        <span class="delete-resolution btn btn-sm btn-sidebar">
                             <i class="bi bi-trash2 text-danger"></i>
                         </span>
                     </div>
@@ -173,6 +178,11 @@ function addNewResolution(width, height, active) {
         const [_, resolution] = resolutionContainer.find("input[type=checkbox]").attr("id").split("_");
         deleteResolution(resolution)
         resolutionContainer.remove();
+    });
+
+    $("input[name='resolutions']").off("change").on("change", function() {
+        // TODO: logic for selecting all resolutions
+        $("#resolutionsAll").prop("indeterminate", true);
     });
 }
 
@@ -224,6 +234,60 @@ $(document).ready(function() {
     parsedStorage.forEach(function(item) {
         const [width, height] = item.resolution.split("x");
         addNewResolution(width, height, item.active === "true");
+    });
+});
+
+$("#sortResolutionsDesktop").on("click", function() {
+    const list = $("#resolutionDropdown > ul");
+
+    list.children("li").sort(function(first, second) {
+        const firstSize = $(first).find("input[name='resolutions']").val();
+        const [firstWidth, firstHeight] = firstSize.split("x");
+
+        const secondSize = $(second).find("input[name='resolutions']").val();
+        const [secondWidth, secondHeight] = secondSize.split("x");
+
+        if (parseInt(firstHeight) <= parseInt(firstWidth)) {
+            return -1;
+        }
+        else if (parseInt(secondHeight) <= parseInt(secondWidth)) {
+            return 1;
+        } 
+        else {
+        }
+    }).appendTo(list);
+});
+
+$("#sortResolutionsMobile").on("click", function() {
+    const list = $("#resolutionDropdown > ul");
+
+    list.children("li").sort(function(first, second) {
+        const firstSize = $(first).find("input[name='resolutions']").val();
+        const [firstWidth, firstHeight] = firstSize.split("x");
+
+        const secondSize = $(second).find("input[name='resolutions']").val();
+        const [secondWidth, secondHeight] = secondSize.split("x");
+
+        if (parseInt(firstHeight) > parseInt(firstWidth)) {
+            return -1;
+        }
+        else if (parseInt(secondHeight) > parseInt(secondWidth)) {
+            return 1;
+        } 
+        else {
+            return firstSize.localeCompare(secondSize);
+        }
+    }).appendTo(list);
+});
+
+$("#deleteAllResolutions").click(function() {
+    $(".delete-resolution").click();
+});
+
+$("#resolutionsAll").on("click", function() {
+    const checked = $(this).prop("checked");
+    $("input[name='resolutions']").each(function() {
+        $(this).prop("checked", checked);
     });
 });
 

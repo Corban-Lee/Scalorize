@@ -37,7 +37,32 @@
                         <i class="bi bi-sliders2"></i>
                     </button>
                     <div id="resolutionDropdown" class="topdrop-menu dropdown-menu">
-                        <ul class="ps-0"></ul>
+                        <div class="resolution-button btn topdrop-button cursor-default">
+                            <div class="resolution-area">
+                                <input type="checkbox" name="resolutionsAll" id="resolutionsAll" class="form-check-input my-auto">
+                                <span>
+                                    Resolutions
+                                </span>
+                                <i class="bi bi-info-circle"></i>
+                            </div>
+                            <div class="collapse collapse-horizontal resolution-collapse">
+                                <div class="resolution-actions">
+                                    <div class="btn-group btn-group-sm me-2">
+                                        <span id="sortResolutionsDesktop" class="btn btn-sidebar" data-bs-toggle="tooltip" data-bs-title="Sort by Desktop">
+                                            <i class="bi bi-pc-display-horizontal"></i>
+                                        </span>
+                                        <span id="sortResolutionsMobile" class="btn btn-sidebar" data-bs-toggle="tooltip" data-bs-title="Sort by Mobile">
+                                            <i class="bi bi-phone"></i>
+                                        </span>
+                                    </div>
+                                    <span id="deleteAllResolutions" class="btn btn-sm btn-sidebar" data-bs-toggle="tooltip" data-bs-title="Delete All">
+                                        <i class="bi bi-trash2 text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="text-body-tertiary my-2">
+                        <ul class="ps-0 my-3"></ul>
                         <hr class="text-body-tertiary my-2">
                         <div class="btn-group w-100 px-2">
                             <button id="openNewResolutionCollapse" class="resolution-item btn-sidebar w-50 px-3 py-2 text-body rounded justify-content-center" data-bs-toggle="collapse" data-bs-target="#newResolutionCollapse">
@@ -51,16 +76,16 @@
                         <div id="newResolutionCollapse" class="collapse">
                             <hr class="my-2 text-body-tertiary">
                             <form id="newResolutionForm" class="d-flex px-3 py-1">
-                                <div class="input-group me-3">
-                                    <input type="number" id="newResolutionWidth" class="form-control text-end border-end-0 no-arrows" placeholder="width" required>
-                                    <span class="border-top border-bottom d-flex align-items-center">
+                                <div class="input-group shadow-sm">
+                                    <input type="number" id="newResolutionWidth" class="form-control text-end border-0 bg-body-tertiary no-arrows" placeholder="width" required>
+                                    <span class="d-flex align-items-center bg-body-tertiary">
                                         <i class="bi bi-x"></i>
                                     </span>
-                                    <input type="number" id="newResolutionHeight" class="form-control border-start-0 no-arrows" placeholder="height" required>
+                                    <input type="number" id="newResolutionHeight" class="form-control border-0 bg-body-tertiary no-arrows" placeholder="height" required>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
                                 </div>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-plus-lg"></i>
-                                </button>
                             </form>
                         </div>
 
@@ -102,7 +127,7 @@
                     </div>
 
                     <input type="search" id="search" class="form-control border-0" placeholder="Enter a web address here, then press 'enter' or the search button to get started">
-                    <button type="submit" class="btn topbar-button">
+                    <button type="submit" id="searchBtn" class="btn topbar-button">
                         <i class="bi bi-search"></i>
                     </button>
                 </form>
