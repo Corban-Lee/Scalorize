@@ -3,11 +3,16 @@ Web Scraper for the application.
 """
 
 import base64
+import logging
 import asyncio
 from asyncio.queues import Queue
 from pathlib import Path
 from urllib.parse import urlparse, urljoin
-from playwright.async_api import async_playwright, Page
+from playwright.async_api import async_playwright, Page, Playwright, Browser
+
+
+log = logging.getLogger(__name__)
+logging.getLogger("asyncio").setLevel(logging.WARNING)
 
 
 class WebScraper:
@@ -30,10 +35,39 @@ class WebScraper:
 
     async def get_next_url(self) -> str:
         """
+        Returns the next URL from the url_queue.
+        If empty, waits until the next URL is available.
 
+        Returns
+        -------
+        url : str
+            The next available URL
         """
 
-        return await self.url_queue.get()
+        try:
+            return await asyncio.wait_for(self.url_queue.get(), timeout=5)
+        except TimeoutError:
+            return None
+
+    async def get_browser(self, playwright: Playwright, browser_name: str) -> Browser:
+        """
+        Returns the requested browser for playwright.
+
+        Arguments
+        ----------
+        playwright : Playwright
+            An instance of Playwright, required to retrieve the browsers.
+        browser_name : str
+            The name of the browser to retrieve, can be `chrome`, `firefox` or `safari`.
+        """
+
+        return {
+            "chrome": playwright.chromium,
+            "firefox": playwright.firefox,
+            "safari": playwright.webkit
+        }[browser_name]
+
+
 
     async def start(self, url: str):
         """
@@ -46,58 +80,50 @@ class WebScraper:
             The base URL of the scraping process.
         """
 
+        log.info("Starting Scraper")
+
         await self.url_queue.put(url)
         self.initial_url = urlparse(url)
         self.initial_url_str = url
 
-
         async with async_playwright() as playwright:
-            browser_options = {
-                "chrome": playwright.chromium,
-                "edge": playwright.chromium,
-                "firefox": playwright.firefox,
-                "safari": playwright.webkit
-            }
-
-            browser = await browser_options[self.browser_name].launch()
-            self.browser = browser
-
-            tasks = []
-            semaphore = asyncio.Semaphore(self.semaphore_limit)
-
-            while not self.complete:
-                print(f"queue size: {self.url_queue.qsize()} | tasks: {len(tasks)}")
-
-                tasks = [task for task in tasks if not task.done()]
-
-                # Wait until there is room for another task
-                if len(tasks) >= self.semaphore_limit:
-                    await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
-
-
-                # Queue up another task
-                elif tasks or not self.url_queue.empty():
-                    try:
-                        url = await asyncio.wait_for(self.get_next_url(), timeout=5)
-                    except TimeoutError:
-                        continue
-                    self.visited_urls.add(url)
-                    tasks.append(asyncio.create_task(self.process_url(url, semaphore)))
-
-                else:
-                    break
-
-                # TODO:
-                # Write condition in which processing is 'done' and break out of the loop
-                # elif not tasks and self.url_queue.empty():  # infinite loop
-                #     break
-
+            self.browser = self.get_browser(playwright, self.browser_name).launch()
+            tasks = await self.run_until_complete()
             await asyncio.gather(*tasks)
 
         # When finished, set a flag and add None to the result queue.
         # This ensures that the `fetch_completed` method doesn't hang.
         self.complete = True
         await self.screenshot_queue.put((None, None, None, None))
+
+    async def run_until_complete(self, semaphore):
+        """
+        """
+
+        tasks = []
+        semaphore = asyncio.Semaphore(self.semaphore_limit)
+
+        while not self.complete:
+            print(f"queue size: {self.url_queue.qsize()} | tasks: {len(tasks)}")
+
+            tasks = [task for task in tasks if not task.done()]
+
+            # Wait until there is room for another task
+            if len(tasks) >= self.semaphore_limit:
+                await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+
+
+            # Queue up another task
+            elif tasks or not self.url_queue.empty():
+                url = await asyncio.wait_for(self.get_next_url(), timeout=5)
+                if not url:
+                    continue
+        
+                self.visited_urls.add(url)
+                tasks.append(asyncio.create_task(self.process_url(url, semaphore)))
+
+            else:
+                break
 
     async def process_url(self, url: str, semaphore: asyncio.Semaphore):
         """
