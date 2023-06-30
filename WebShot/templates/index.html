@@ -12,10 +12,10 @@
 </head>
 <body>
     <div id="root">
-        <div class="bg-body-tertiary shadow overflow-auto" id="sidebar">
+        <div class="shadow overflow-auto" id="sidebar">
 
             <!-- Branding -->
-             <div class="bg-body-secondary shadow-sm text-center px-4 py-3">
+             <div class="shadow-sm text-center px-4 py-3">
                 <a href="/" id="brand" class="w-100">
                     <img src="{{ url_for('static', filename='images/logo-text.png') }}" alt="product logo" height="45">
                 </a>
@@ -30,7 +30,7 @@
         <!-- Image Results Area -->
         <div class="d-flex flex-grow-1 flex-column overflow-y-auto position-relative" style="scroll-behavior: smooth; min-height: 300px;">
 
-            <div class="w-100 bg-body-tertiary px-4 d-flex align-items-center shadow-sm position-sticky sticky-top" style="min-height: 77px">
+            <div id="topbar" class="w-100 px-4 d-flex align-items-center shadow-sm position-sticky sticky-top" style="min-height: 77px">
                 
                 <div class="dropdown">
                     <button id="btnScreenSizes" class="btn topbar-button shadow-sm me-3" data-bs-toggle="dropdown">

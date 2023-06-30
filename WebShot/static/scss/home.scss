@@ -1,5 +1,27 @@
+$light-colour-text: #090706;
+$light-colour-background: #f0f0f0;
+$light-colour-primary: #21158e;
+$light-colour-secondary: #f8fcf7;
+$light-colour-accent: #566bae;
 
+$dark-colour-text: #eaf0f1;
+$dark-colour-background: #131b1b;
+$dark-colour-primary: #303946;
+$dark-colour-secondary: #f9f9f9;
+$dark-colour-accent:#202a3c;
 
+// --text: 
+// --background: 
+// --primary-button: 
+// --secondary-button: 
+// --accent: 
+
+// orange
+// --text: #270e02;
+// --background: #fef5f0;
+// --primary-button: #ed570c;
+// --secondary-button: #ffffff;
+// --accent: #f36720;
 
 @font-face {
     font-family: "Helios";
@@ -19,6 +41,11 @@ body {
     font-family: "Helios";
     min-height: 100vh;
     max-height: 100vh;
+    background-color: $light-colour-background;
+
+    &[data-bs-theme="dark"] {
+        background-color: $dark-colour-background;
+    }
 }
 
 #root {
@@ -40,6 +67,11 @@ body {
     flex-direction: column;
     flex-shrink: 0;
     width: 300px;
+    background-color: $light-colour-background;
+
+    [data-bs-theme="dark"] {
+        background-color: $dark-colour-background;
+    }
 
     @media (max-width: 768px) {
         width: 100%;
@@ -220,6 +252,22 @@ input[type=number].no-arrows {
 
 }
 
+#topbar {
+    background-color: $light-colour-background;
+
+    [data-bs-theme=dark] {
+        background-color: $dark-colour-background;
+    }
+
+    input[type=search] {
+        background-color: $light-colour-secondary;
+
+        [data-bs-theme=dark] {
+            background-color: $dark-colour-secondary;
+        }
+    }
+}
+
 // Custom TopBar Dropdown Menu
 
 .topdrop-menu {
@@ -269,7 +317,7 @@ input[type=number].no-arrows {
 
 .btn-check:checked + .theme-btn {
     color: var(--bs-light);
-    background-color: var(--bs-primary); 
+    background-color: $light-colour-primary; 
 }
 
 // Custom Topbar button
@@ -277,7 +325,7 @@ input[type=number].no-arrows {
 .topbar-button {
 
     color: var(--bs-body-color);
-    background-color: var(--bs-body-bg);
+    background-color: $light-colour-secondary;
     border: none;
 
     &:hover {
@@ -286,6 +334,10 @@ input[type=number].no-arrows {
 
     &.show, &:active {
         background-color: var(--bs-secondary-bg) !important;
+    }
+
+    [data-bs-theme="dark"] {
+        background-color: $dark-colour-secondary;
     }
 }
 

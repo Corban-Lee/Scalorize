@@ -16,6 +16,11 @@ body {
   font-family: "Helios";
   min-height: 100vh;
   max-height: 100vh;
+  background-color: #f0f0f0;
+}
+
+body[data-bs-theme="dark"] {
+  background-color: #131b1b;
 }
 
 #root {
@@ -39,6 +44,11 @@ body {
   flex-direction: column;
   flex-shrink: 0;
   width: 300px;
+  background-color: #f0f0f0;
+}
+
+#sidebar [data-bs-theme="dark"] {
+  background-color: #131b1b;
 }
 
 @media (max-width: 768px) {
@@ -207,6 +217,22 @@ input[type=number].no-arrows {
   background: none;
 }
 
+#topbar {
+  background-color: #f0f0f0;
+}
+
+#topbar [data-bs-theme=dark] {
+  background-color: #131b1b;
+}
+
+#topbar input[type=search] {
+  background-color: #f8fcf7;
+}
+
+#topbar input[type=search] [data-bs-theme=dark] {
+  background-color: #f9f9f9;
+}
+
 .topdrop-menu {
   border: none !important;
   border-radius: var(--bs-border-radius);
@@ -254,12 +280,12 @@ input[type=number].no-arrows {
 
 .btn-check:checked + .theme-btn {
   color: var(--bs-light);
-  background-color: var(--bs-primary);
+  background-color: #21158e;
 }
 
 .topbar-button {
   color: var(--bs-body-color);
-  background-color: var(--bs-body-bg);
+  background-color: #f8fcf7;
   border: none;
 }
 
@@ -269,6 +295,10 @@ input[type=number].no-arrows {
 
 .topbar-button.show, .topbar-button:active {
   background-color: var(--bs-secondary-bg) !important;
+}
+
+.topbar-button [data-bs-theme="dark"] {
+  background-color: #f9f9f9;
 }
 
 .cursor-default {
