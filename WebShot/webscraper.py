@@ -2,7 +2,6 @@
 Web Scraper for the application.
 """
 
-import time
 import base64
 import logging
 import asyncio
@@ -81,26 +80,23 @@ class WebScraper:
             The base URL of the scraping process.
         """
 
-        log.info("Starting Scraper From URL: %s" % url)
+        log.info("Starting Scraper")
 
         await self.url_queue.put(url)
         self.initial_url = urlparse(url)
         self.initial_url_str = url
 
         async with async_playwright() as playwright:
-            browser = await self.get_browser(playwright, self.browser_name)
-            self.browser = await browser.launch()
+            self.browser = self.get_browser(playwright, self.browser_name).launch()
             tasks = await self.run_until_complete()
             await asyncio.gather(*tasks)
-
-        log.info("Scraping Complete")
 
         # When finished, set a flag and add None to the result queue.
         # This ensures that the `fetch_completed` method doesn't hang.
         self.complete = True
         await self.screenshot_queue.put((None, None, None, None))
 
-    async def run_until_complete(self):
+    async def run_until_complete(self, semaphore):
         """
         """
 
@@ -108,26 +104,21 @@ class WebScraper:
         semaphore = asyncio.Semaphore(self.semaphore_limit)
 
         while not self.complete:
-            log.debug("Queue size: %s | Tasks: %s" % (self.url_queue.qsize(), len(tasks)))
+            print(f"queue size: {self.url_queue.qsize()} | tasks: {len(tasks)}")
 
             tasks = [task for task in tasks if not task.done()]
 
             # Wait until there is room for another task
             if len(tasks) >= self.semaphore_limit:
-                wait_time = time.time()
-                log.debug("Concurrent limit reached, waiting for task to complete")
                 await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
-                log.debug("Task completed after %s seconds, slot is now available" % round(time.time() - wait_time, 2))
+
 
             # Queue up another task
             elif tasks or not self.url_queue.empty():
-                log.debug("Waiting for URL")
-                url = await asyncio.wait_for(self.get_next_url(), timeout=7)
+                url = await asyncio.wait_for(self.get_next_url(), timeout=5)
                 if not url:
                     continue
         
-                log.debug("Valid URL '%s' found, adding new task" % url)
-
                 self.visited_urls.add(url)
                 tasks.append(asyncio.create_task(self.process_url(url, semaphore)))
 
@@ -141,9 +132,6 @@ class WebScraper:
 
         async with semaphore:
 
-            process_url_time = time.time()
-            log.debug("Processing URL '%s'" % url)
-
             page = await self.browser.new_page(base_url=self.initial_url_str)
             await page.goto(url, timeout=30000, wait_until="domcontentloaded")
             await self.screenshot(page)
@@ -152,8 +140,6 @@ class WebScraper:
                 for anchor in await page.query_selector_all("a[href]")
             ]
             await page.close(run_before_unload=True)
-
-            log.debug("Finished processing URL '%s' after %s seconds" % (url, round(time.time() - process_url_time, 2)))
 
         asyncio.ensure_future(self.queue_hrefs(hrefs))
 
